@@ -73,6 +73,10 @@
             "Scalar.AspNetCore": {
               "target": "Package",
               "version": "[2.13.1, )"
+            },
+            "stellar-dotnet-sdk": {
+              "target": "Package",
+              "version": "[15.1.0, )"
             }
           },
           "imports": [

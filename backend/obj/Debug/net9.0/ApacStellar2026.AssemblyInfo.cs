@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ApacStellar2026")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+77bfb581802ea1e9d3e2101661f78226957869fa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1667527664f457479ce2821059a308ea0f94b6cf")]
 [assembly: System.Reflection.AssemblyProductAttribute("ApacStellar2026")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ApacStellar2026")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
