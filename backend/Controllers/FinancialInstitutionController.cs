@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ApacStellar2026.DatabaseCtx;
-using Microsoft.EntityFrameworkCore;
+using ApacStellar2026.Dto.FinancialInstitutionDto;
+using ApacStellar2026.Interface;
 
 namespace ApacStellar2026.Controllers;
 
@@ -9,16 +8,70 @@ namespace ApacStellar2026.Controllers;
 [ApiController]
 public class FinancialInstitutionController : ControllerBase
 {
-    private readonly ApplicationDatabaseCtx _dbCtx;
+    private readonly IFinancialInstitutionService _financialInstitutionService;
 
-    public FinancialInstitutionController(ApplicationDatabaseCtx dbCtx)
+    public FinancialInstitutionController(IFinancialInstitutionService financialInstitutionService)
     {
-        _dbCtx = dbCtx;
+        _financialInstitutionService = financialInstitutionService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetFinancialInstitutions()
     {
-        return Ok(await _dbCtx.FinancialInstitution.ToListAsync());
+        var result = await _financialInstitutionService.GetAllAsync();
+        return Ok(result);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetFinancialInstitutionById(int id)
+    {
+        var result = await _financialInstitutionService.GetByIdAsync(id);
+        if (result == null)
+        {
+            return NotFound(new { message = $"Financial institution with ID {id} not found." });
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateFinancialInstitution([FromBody] FinancialInstitutionCreateDto request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new { message = "Financial institution data is null." });
+        }
+
+        var result = await _financialInstitutionService.CreateAsync(request);
+        return CreatedAtAction(nameof(GetFinancialInstitutionById), new { id = result.FinancialInstitutionId }, result);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateFinancialInstitution(int id, [FromBody] UpdateFinancialInstitutionDto request)
+    {
+        if (request == null)
+        {
+            return BadRequest(new { message = "Financial institution data is null." });
+        }
+
+        var result = await _financialInstitutionService.UpdateAsync(id, request);
+        if (result == null)
+        {
+            return NotFound(new { message = $"Financial institution with ID {id} not found." });
+        }
+
+        return Ok(result);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteFinancialInstitution(int id)
+    {
+        var deleted = await _financialInstitutionService.DeleteAsync(id);
+        if (!deleted)
+        {
+            return NotFound(new { message = $"Financial institution with ID {id} not found." });
+        }
+
+        return NoContent();
     }
 }
