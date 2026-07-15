@@ -9,6 +9,7 @@ using System.Security.Claims;
 using ApacStellar2026.DatabaseCtx;
 using ApacStellar2026.Models;
 using ApacStellar2026.Settings;
+using ApacStellar2026.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,7 @@ builder.Services.AddRateLimiter(options =>
         await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", cancellationToken);
     };
 });
+builder.Services.AddScoped<IdentitySeederService>();
 
 var app = builder.Build();
 
@@ -89,5 +91,19 @@ app.UseRateLimiter();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
    .AllowAnonymous();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<IdentitySeederService>();
+
+    try
+    {
+        await seeder.SeedRolesAsync();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Role Seeding Failed: {ex.Message}");
+    }
+}
 
 app.Run();

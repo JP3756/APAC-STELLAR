@@ -11,4 +11,6 @@ public class ApplicationUser : IdentityUser
     public string? MiddleName { get; set; }
 
     public string? Suffix { get; set; }
+
+    public ICollection<ConnectedAccount> ConnectedAccounts { get; set; } = new List<ConnectedAccount>();
 }
