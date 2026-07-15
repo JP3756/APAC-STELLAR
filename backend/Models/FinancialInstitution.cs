@@ -2,10 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ApacStellar2026.Models;
 
-public class FinanctialInstitution
+public class FinancialInstitution
 { 
     [Key]
-    public int FinanctialInstitutionId { get; set; }
+    public int FinancialInstitutionId { get; set; }
 
     public string Name { get; set; }
 

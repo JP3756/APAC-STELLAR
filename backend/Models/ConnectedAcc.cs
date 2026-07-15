@@ -12,7 +12,7 @@ public class ConnectedAccount
 
     public int InstitutionId { get; set; }
 
-    public FinanctialInstitution FinanctialInstitution { get; set; }
+    public FinancialInstitution FinancialInstitution { get; set; }
 
     public int AccountType { get; set; }
 

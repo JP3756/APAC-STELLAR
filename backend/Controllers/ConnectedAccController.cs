@@ -16,6 +16,7 @@ public class ConnectedAccController : ControllerBase
         _dbCtx = dbCtx;
     }
 
+    [HttpGet]
     public async Task<IActionResult> GetTransactions()
     {
         return Ok(await _dbCtx.Transaction.ToListAsync());

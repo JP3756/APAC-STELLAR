@@ -3,6 +3,7 @@ using System;
 using ApacStellar2026.DatabaseCtx;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ApacStellar2026.Migrations
 {
     [DbContext(typeof(ApplicationDatabaseCtx))]
-    partial class ApplicationDatabaseCtxModelSnapshot : ModelSnapshot
+    [Migration("20260715045902_FixedFinanctialInstitutionsNameTypo")]
+    partial class FixedFinanctialInstitutionsNameTypo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +36,7 @@ namespace ApacStellar2026.Migrations
                     b.Property<int>("AccountType")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FinancialInstitutionId")
+                    b.Property<int>("FinanctialInstitutionId")
                         .HasColumnType("integer");
 
                     b.Property<int>("InstitutionId")
@@ -48,20 +51,20 @@ namespace ApacStellar2026.Migrations
 
                     b.HasKey("AccountId");
 
-                    b.HasIndex("FinancialInstitutionId");
+                    b.HasIndex("FinanctialInstitutionId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("ConnectedAccount");
                 });
 
-            modelBuilder.Entity("ApacStellar2026.Models.FinancialInstitution", b =>
+            modelBuilder.Entity("ApacStellar2026.Models.FinanctialInstitution", b =>
                 {
-                    b.Property<int>("FinancialInstitutionId")
+                    b.Property<int>("FinanctialInstitutionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FinancialInstitutionId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FinanctialInstitutionId"));
 
                     b.Property<string>("ApiEndpoint")
                         .IsRequired()
@@ -77,7 +80,7 @@ namespace ApacStellar2026.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("FinancialInstitutionId");
+                    b.HasKey("FinanctialInstitutionId");
 
                     b.ToTable("FinancialInstitution");
                 });
@@ -421,9 +424,9 @@ namespace ApacStellar2026.Migrations
 
             modelBuilder.Entity("ApacStellar2026.Models.ConnectedAccount", b =>
                 {
-                    b.HasOne("ApacStellar2026.Models.FinancialInstitution", "FinancialInstitution")
+                    b.HasOne("ApacStellar2026.Models.FinanctialInstitution", "FinanctialInstitution")
                         .WithMany("ConnectedAccounts")
-                        .HasForeignKey("FinancialInstitutionId")
+                        .HasForeignKey("FinanctialInstitutionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -433,7 +436,7 @@ namespace ApacStellar2026.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FinancialInstitution");
+                    b.Navigation("FinanctialInstitution");
 
                     b.Navigation("User");
                 });
@@ -537,7 +540,7 @@ namespace ApacStellar2026.Migrations
                     b.Navigation("Loans");
                 });
 
-            modelBuilder.Entity("ApacStellar2026.Models.FinancialInstitution", b =>
+            modelBuilder.Entity("ApacStellar2026.Models.FinanctialInstitution", b =>
                 {
                     b.Navigation("ConnectedAccounts");
                 });
