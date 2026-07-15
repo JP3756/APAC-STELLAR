@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- skill:chrome -->
+<style>
+/* Credit line — bottom-right */
+.design-ui-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  font: 11px/1 system-ui, sans-serif;
+  color: rgba(128,128,128,0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity 0.4s ease;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* Hide chrome on touch devices */
+@media (hover: none) {
+  .design-ui-credit { display: none; }
+}
+
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .design-ui-credit { display: none !important; }
+}
+
+</style>
+<script>
+(function () {
+    // Design-ui pages are single compositions, so the whole body is editable.
+    function markEditable() {
+        document.body.classList.add('artifact-editable');
+    }
+
+    // Credit badge with idle-fade. Hover devices only.
+    function initChromeUI() {
+        if (!matchMedia('(hover: hover)').matches) return;
+
+        var credit = document.createElement('div');
+        credit.className = 'design-ui-credit';
+        credit.setAttribute('aria-hidden', 'true');
+        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
+        document.body.appendChild(credit);
+
+        var timer = null;
+        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
+        fade(true);
+        var show = function () {
+            fade(false);
+            clearTimeout(timer);
+            timer = setTimeout(function () { fade(true); }, 3000);
+        };
+        document.addEventListener('mousemove', show);
+        show();
+    }
+
+    function init() {
+        markEditable();
+        initChromeUI();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
+<!-- skill:libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js" integrity="sha384-XcdcwHqIPULERb2yDEM4R0XaQKU3YnDsrTmjACBZyfdVVqjh6xQ4/DCMd7XLcA6Y" crossorigin="anonymous"></script>
+<!-- /skill:libraries -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniFi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: oklch(96.5% 0.006 95);
+      --paper: oklch(98.5% 0.005 95);
+      --ink: oklch(22% 0.015 60);
+      --muted: oklch(50% 0.02 60);
+      --faint: oklch(70% 0.015 70);
+      --line: oklch(88% 0.012 80);
+      --brand: oklch(50% 0.13 42);
+      --brand-strong: oklch(42% 0.14 40);
+      --brand-soft: oklch(93% 0.03 55);
+      --biz: oklch(45% 0.1 195);
+      --biz-soft: oklch(93% 0.028 195);
+      --ok: oklch(56% 0.12 150);
+      --warn: oklch(66% 0.13 70);
+      --bad: oklch(56% 0.18 28);
+      --lh: 1.5;
+      --u: 4px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+      --shadow: 0 1px 0 rgba(60,45,30,0.03), 0 24px 48px -28px rgba(60,45,30,0.28);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Inter Tight", system-ui, sans-serif;
+      font-size: 16px; line-height: var(--lh);
+      -webkit-font-smoothing: antialiased;
+      font-optical-sizing: auto;
+    }
+    h1,h2,h3,h4,p { margin: 0; }
+    h1,h2,h3 { text-wrap: balance; }
+    .serif { font-family: "Fraunces", Georgia, serif; font-optical-sizing: auto; }
+    .mono { font-family: "JetBrains Mono", monospace; font-feature-settings: "tnum" 1; }
+    button, input, select { font: inherit; color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    .hidden { display: none !important; }
+    .num { font-variant-numeric: tabular-nums; }
+
+    .eyebrow {
+      font-family: "JetBrains Mono", monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.7rem;
+      color: var(--brand);
+      font-weight: 500;
+    }
+    .business-mode .eyebrow { color: var(--biz); }
+
+    /* ---------- LANDING ---------- */
+    .landing {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+    }
+    .hero {
+      padding: clamp(32px, 6vw, 88px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 48px;
+      position: relative;
+      border-right: 1px solid var(--line);
+    }
+    .wordmark { display: flex; align-items: baseline; gap: 10px; }
+    .wordmark .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--brand); display: inline-block; margin-bottom: 2px; }
+    .wordmark strong { font-family: "Fraunces"; font-weight: 600; font-size: 1.35rem; letter-spacing: -0.02em; }
+
+    h1.display {
+      font-family: "Fraunces";
+      font-weight: 500;
+      font-size: clamp(3.2rem, 7vw, 6.4rem);
+      line-height: 0.92;
+      letter-spacing: -0.035em;
+      max-width: 14ch;
+    }
+    h1.display em { font-style: italic; color: var(--brand); }
+    .hero-lede { max-width: 52ch; font-size: 1.1rem; color: var(--muted); margin-top: 28px; }
+
+    .ticker {
+      display: flex; flex-wrap: wrap; gap: 8px 28px;
+      padding-top: 28px; border-top: 1px solid var(--line);
+    }
+    .ticker div { display: flex; flex-direction: column; }
+    .ticker b { font-family: "Fraunces"; font-size: 1.5rem; letter-spacing: -0.03em; }
+    .ticker span { font-size: 0.8rem; color: var(--faint); }
+
+    .login {
+      padding: clamp(32px, 5vw, 72px) clamp(28px, 4vw, 56px);
+      background: var(--paper);
+      display: flex; flex-direction: column; justify-content: center; gap: 28px;
+    }
+    .login h2 { font-family: "Fraunces"; font-weight: 500; font-size: 2.1rem; letter-spacing: -0.03em; }
+    .login .sub { color: var(--muted); max-width: 40ch; margin-top: 8px; }
+    .field { display: grid; gap: 8px; }
+    .field label { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.01em; }
+    input, select {
+      width: 100%; height: 52px; padding: 0 16px;
+      border: 1px solid var(--line); border-radius: 4px;
+      background: var(--bg);
+      transition: border-color .25s var(--ease), box-shadow .25s var(--ease);
+    }
+    input:focus-visible, select:focus-visible {
+      outline: none; border-color: var(--brand);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand) 18%, transparent);
+    }
+
+    .btn {
+      min-height: 50px; padding: 0 22px; border: 1px solid transparent;
+      border-radius: 4px; font-weight: 600; letter-spacing: 0.01em; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      transition: transform .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease), color .2s var(--ease);
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--ink); color: var(--paper); }
+    .btn-primary:hover { background: var(--brand-strong); }
+    .business-mode .btn-primary:hover { background: var(--biz); }
+    .btn-outline { background: transparent; border-color: var(--line); }
+    .btn-outline:hover { border-color: var(--ink); }
+    .btn-biz { background: var(--biz); color: white; }
+    .btn-ghost { background: transparent; }
+    .btn-ghost:hover { color: var(--brand); }
+    .btn-sm { min-height: 40px; padding: 0 15px; font-size: 0.88rem; }
+
+    /* ---------- APP CHROME ---------- */
+    .topbar {
+      position: sticky; top: 0; z-index: 30;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; padding: 16px clamp(20px, 4vw, 48px);
+      background: color-mix(in oklab, var(--bg) 85%, transparent);
+      backdrop-filter: blur(14px) saturate(1.4);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav { display: flex; gap: 4px; }
+    .nav span {
+      padding: 8px 14px; border-radius: 999px; color: var(--muted);
+      font-weight: 500; font-size: 0.92rem; cursor: pointer; position: relative;
+      transition: color .2s var(--ease);
+    }
+    .nav span:hover { color: var(--ink); }
+    .nav span.on { color: var(--ink); }
+    .nav span.on::after {
+      content: ""; position: absolute; left: 14px; right: 14px; bottom: 2px; height: 2px;
+      background: var(--brand); border-radius: 2px;
+    }
+    .business-mode .nav span.on::after { background: var(--biz); }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+
+    .mode-chip {
+      font-family: "JetBrains Mono", monospace; font-size: 0.68rem;
+      text-transform: uppercase; letter-spacing: 0.14em; padding: 5px 10px;
+      border-radius: 999px; border: 1px solid var(--line); color: var(--muted);
+    }
+    .business-mode .mode-chip { color: var(--biz); border-color: color-mix(in oklab, var(--biz) 40%, var(--line)); }
+
+    .page { padding: clamp(28px, 4vw, 56px) clamp(20px, 4vw, 48px) 120px; max-width: 1360px; margin: 0 auto; }
+    .view { animation: rise .5s var(--ease) both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+    .lede-row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px; align-items: end; margin-bottom: 48px; }
+    .lede-row h2 { font-family: "Fraunces"; font-weight: 500; font-size: clamp(2.2rem, 4vw, 3.6rem); line-height: 0.98; letter-spacing: -0.035em; margin-top: 12px; }
+    .lede-row p { color: var(--muted); max-width: 50ch; }
+
+    /* editorial asymmetric grid instead of card soup */
+    .board { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .cell { background: var(--paper); padding: clamp(20px, 2.6vw, 34px); }
+    .cell.span2 { grid-column: 1 / -1; }
+    .cell-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 22px; }
+    .cell-head h3 { font-family: "Fraunces"; font-weight: 500; font-size: 1.25rem; letter-spacing: -0.02em; }
+    .cell-head .lbl { font-size: 0.8rem; color: var(--faint); }
+
+    .bignum { font-family: "Fraunces"; font-weight: 500; font-size: clamp(2.8rem, 6vw, 5rem); letter-spacing: -0.05em; line-height: 0.9; }
+    .midnum { font-family: "Fraunces"; font-weight: 500; font-size: 2.2rem; letter-spacing: -0.04em; }
+
+    .rows { display: grid; }
+    .row {
+      display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+      padding: 16px 0; border-top: 1px solid var(--line);
+    }
+    .row:first-child { border-top: 0; }
+    .row .k { font-weight: 600; }
+    .row .s { font-size: 0.82rem; color: var(--faint); }
+    .row .v { text-align: right; font-weight: 600; }
+
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px;
+      border-radius: 999px; font-size: 0.76rem; font-weight: 600; letter-spacing: 0.01em;
+      border: 1px solid transparent;
+    }
+    .tag.ok { background: color-mix(in oklab, var(--ok) 12%, white); color: oklch(42% 0.1 152); }
+    .tag.warn { background: color-mix(in oklab, var(--warn) 16%, white); color: oklch(48% 0.11 66); }
+    .tag.bad { background: color-mix(in oklab, var(--bad) 12%, white); color: oklch(48% 0.15 28); }
+    .tag.brand { background: var(--brand-soft); color: var(--brand-strong); }
+
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; margin-top: 24px; }
+    .stack { display: grid; gap: 16px; }
+
+    .quiet {
+      padding: 16px 18px; border-radius: 8px; background: var(--bg);
+      border: 1px solid var(--line); color: var(--muted); font-size: 0.94rem;
+    }
+    .insight { display: flex; gap: 12px; align-items: flex-start; padding: 16px 0; border-top: 1px solid var(--line); }
+    .insight:first-child { border-top: 0; }
+    .insight .idx { font-family: "JetBrains Mono"; font-size: 0.72rem; color: var(--brand); padding-top: 3px; }
+
+    .loan { padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); cursor: pointer; display: grid; gap: 16px; text-align: left; transition: border-color .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease); }
+    .loan:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .loan.sel { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); }
+    .meter { height: 6px; border-radius: 999px; background: var(--bg); overflow: hidden; }
+    .meter i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--ok), var(--warn) 60%, var(--bad)); transition: width .6s var(--ease); }
+
+    .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: clamp(20px, 2.6vw, 32px); }
+
+    .mode-banner { grid-column: 1 / -1; padding: 20px 24px; border-radius: 10px; background: var(--biz-soft); border: 1px solid color-mix(in oklab, var(--biz) 22%, white); display: flex; align-items: center; gap: 16px; }
+    .mode-banner .serif { font-family: "Fraunces"; font-size: 1.15rem; }
+
+    /* ---------- MODAL ---------- */
+    .scrim { position: fixed; inset: 0; z-index: 60; display: none; place-items: center; padding: 24px; background: color-mix(in oklab, var(--ink) 32%, transparent); backdrop-filter: blur(6px); }
+    .scrim.open { display: grid; animation: fade .3s var(--ease); }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+    .sheet { width: min(720px, 100%); background: var(--paper); border-radius: 16px; padding: clamp(24px, 3vw, 40px); box-shadow: var(--shadow); display: grid; gap: 24px; animation: pop .4s var(--ease); }
+    @keyframes pop { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: none; } }
+    .inst-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+    .inst { text-align: left; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); cursor: pointer; display: grid; gap: 6px; transition: border-color .25s var(--ease), transform .25s var(--ease); }
+    .inst:hover { border-color: var(--brand); transform: translateY(-2px); }
+    .inst b { font-weight: 600; }
+    .inst .amt { font-family: "Fraunces"; font-size: 1.4rem; letter-spacing: -0.03em; }
+
+    .result { display: none; margin-top: 4px; padding: 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); gap: 10px; }
+    .result.show { display: grid; animation: rise .4s var(--ease); }
+
+    canvas { max-width: 100%; }
+    .inline { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    @media (max-width: 1000px) {
+      .landing { grid-template-columns: 1fr; }
+      .hero { border-right: 0; border-bottom: 1px solid var(--line); }
+      .board, .lede-row, .split { grid-template-columns: 1fr; }
+      .lede-row { align-items: start; gap: 12px; }
+      .nav { display: none; }
+    }
+    @media (max-width: 620px) {
+      .ticker { gap: 8px 20px; }
+      .top-actions .btn span.full { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- LANDING -->
+  <section class="landing" id="landing">
+    <div class="hero">
+      <div class="wordmark"><span class="dot"></span><strong>UniFi</strong></div>
+      <div>
+        <div class="eyebrow">APAC Stellar Hackathon · Prototype</div>
+        <h1 class="display">Every account, every loan, <em>one honest view.</em></h1>
+        <p class="hero-lede">Your money, your debt, and the scam signals nobody surfaces, in a single place. Settlement runs on Stellar testnet. Everything else is mocked so it ships on static hosting without a single server.</p>
+      </div>
+      <div class="ticker">
+        <div><b class="num">$48.2k</b><span>Aggregated net worth</span></div>
+        <div><b>Horizon + Friendbot</b><span>The only live network calls</span></div>
+        <div><b>Personal · Business</b><span>Two modes, one rail</span></div>
+      </div>
+    </div>
+    <div class="login">
+      <div>
+        <h2>Welcome back.</h2>
+        <p class="sub">Any email and password gets you in. This is a demo of product judgment, not an auth gauntlet.</p>
+      </div>
+      <div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="you@unifi.app" /></div>
+      <div class="field"><label for="password">Password</label><input id="password" type="password" placeholder="••••••••" /></div>
+      <button class="btn btn-primary" id="loginBtn">Enter dashboard</button>
+      <p class="sub mono" style="font-size:0.74rem;">no backend · no database · no secrets</p>
+    </div>
+  </section>
+
+  <!-- APP -->
+  <section class="hidden" id="app">
+    <header class="topbar">
+      <div class="wordmark"><span class="dot"></span><strong>UniFi</strong></div>
+      <nav class="nav" id="nav">
+        <span class="on" data-tab="overview">Overview</span>
+        <span data-tab="loans">Loans</span>
+        <span data-tab="investments">Investments</span>
+        <span data-tab="settings">Settings</span>
+      </nav>
+      <div class="top-actions">
+        <span class="mode-chip" id="modeChip">Personal</span>
+        <button class="btn btn-outline btn-sm" id="connectAccountBtn"><span class="full">Connect</span> account</button>
+        <button class="btn btn-biz btn-sm" id="modeToggleBtn">Business</button>
+        <button class="btn btn-ghost btn-sm" id="logoutBtn">Log out</button>
+      </div>
+    </header>
+
+    <main class="page" id="page">
+      <!-- OVERVIEW -->
+      <section class="view" data-view="overview">
+        <div class="lede-row">
+          <div>
+            <div class="eyebrow">Portfolio & Loan Hub</div>
+            <h2>The whole picture, minus the tab chaos.</h2>
+          </div>
+          <p>Linked balances, live investments, loan obligations, and a payment button that actually settles on Stellar testnet. No screenshots, real navigation.</p>
+        </div>
+        <div class="board">
+          <div class="cell">
+            <div class="cell-head"><span class="lbl">Aggregated net worth</span><span class="tag ok">+4.8% MTD</span></div>
+            <div class="bignum num" id="netWorth">$48,240</div>
+            <div class="rows" id="accounts" style="margin-top:22px;"></div>
+          </div>
+          <div class="cell">
+            <div class="cell-head"><h3>Next payment</h3><span class="tag warn">Due soon</span></div>
+            <div id="upcoming"></div>
+          </div>
+          <div class="cell">
+            <div class="cell-head"><h3>Investments</h3><span class="lbl">Seeded holdings</span></div>
+            <div class="rows" id="investRows"></div>
+          </div>
+          <div class="cell">
+            <div class="cell-head"><h3>Insights</h3><span class="lbl">Deterministic, not magic</span></div>
+            <div id="insights"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOANS -->
+      <section class="view hidden" data-view="loans">
+        <div class="lede-row">
+          <div><div class="eyebrow">Loan Servicing</div><h2>The action that proves it's real.</h2></div>
+          <p>Freighter if it's installed, a funded testnet fallback wallet if it isn't, then a live payment ending in a real explorer link.</p>
+        </div>
+        <div class="split">
+          <div class="stack" id="loanCards"></div>
+          <div class="panel">
+            <div class="cell-head"><h3 id="loanTitle">Select a loan</h3><span class="tag brand" id="loanRisk">Waiting</span></div>
+            <div id="loanDetail"><div class="quiet">Pick a loan on the left. That's the whole mechanic.</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INVESTMENTS -->
+      <section class="view hidden" data-view="investments">
+        <div class="lede-row">
+          <div><div class="eyebrow">Investments</div><h2>Sharp enough to feel smart on stage.</h2></div>
+          <p>Allocation chart, insight cards tied to real portfolio composition, and a mock preferred-channel order that behaves like the finished thing.</p>
+        </div>
+        <div class="split">
+          <div class="panel">
+            <div class="cell-head"><h3>Allocation</h3><span class="lbl">By market value</span></div>
+            <canvas id="portfolioChart" height="240"></canvas>
+          </div>
+          <div class="stack">
+            <div class="panel"><div class="cell-head"><h3>Insights</h3><span class="lbl">Hard-coded, on purpose</span></div><div id="investInsights"></div></div>
+            <div class="panel">
+              <div class="cell-head"><h3>Invest via channel</h3><span class="lbl">Mock order</span></div>
+              <div class="stack">
+                <div class="field"><label for="channel">Channel</label><select id="channel"><option>BPI Trade</option><option>DBS Vickers</option><option>Northstar Brokerage</option></select></div>
+                <div class="field"><label for="amount">Amount</label><input id="amount" type="number" value="500" /></div>
+                <button class="btn btn-primary" id="orderBtn">Confirm mock order</button>
+                <div class="quiet" id="orderStatus">No order yet.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="view hidden" data-view="settings">
+        <div class="lede-row">
+          <div><div class="eyebrow">Settings & Profile</div><h2>Lived-in, not padded.</h2></div>
+          <p>Profile shell, linked-account summary, and a session reset that genuinely clears state.</p>
+        </div>
+        <div class="split">
+          <div class="panel" id="profile"></div>
+          <div class="stack">
+            <div class="panel" id="linkedSummary"></div>
+            <div class="panel">
+              <div class="cell-head"><h3>Session</h3><span class="lbl">No hidden persistence</span></div>
+              <button class="btn btn-outline" id="settingsLogout">Clear session & log out</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BUSINESS -->
+      <section class="view hidden" data-view="business">
+        <div class="lede-row">
+          <div><div class="eyebrow">Secure Payment Gateway</div><h2>Institution-side, same rail.</h2></div>
+          <p>Transaction monitoring, fraud flags, and multi-sig setup. Different accent so nobody loses the thread mid-demo.</p>
+        </div>
+        <div class="board">
+          <div class="mode-banner">
+            <span class="tag" style="background:var(--biz);color:white;">Business</span>
+            <div><span class="serif">Same payment records, reframed for the institution.</span></div>
+          </div>
+          <div class="cell">
+            <div class="cell-head"><span class="lbl">Monitored volume today</span><span class="tag ok">96.2% cleared</span></div>
+            <div class="bignum num">$182,400</div>
+            <canvas id="bizChart" height="200" style="margin-top:20px;"></canvas>
+          </div>
+          <div class="cell">
+            <div class="cell-head"><h3>Flagged</h3><span class="lbl">Same feed</span></div>
+            <div class="rows" id="flagged"></div>
+          </div>
+          <div class="cell span2">
+            <div class="cell-head"><h3>Multi-sig policy</h3><span class="lbl">UI only</span></div>
+            <div class="split" style="margin-top:0;">
+              <div><div class="lbl">Signer threshold</div><div class="midnum num">2 of 3</div><div class="meter" style="margin-top:12px;"><i style="width:66%"></i></div></div>
+              <div class="quiet">Approver 1 · Treasury lead · active<br>Approver 2 · Risk officer · active<br>Approver 3 · Ops backup · pending</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- ONBOARDING -->
+  <div class="scrim" id="scrim">
+    <div class="sheet">
+      <div class="cell-head" style="margin:0;">
+        <div><div class="eyebrow">Onboarding</div><h3 class="serif" style="font-size:1.6rem;margin-top:6px;">Connect an account</h3></div>
+        <button class="btn btn-ghost btn-sm" id="closeScrim">Close</button>
+      </div>
+      <p class="sub" style="color:var(--muted);">Pick one. We fake the linking, seed a plausible balance, move on.</p>
+      <div class="inst-grid" id="instGrid"></div>
+      <div class="quiet" id="linkStatus">No account linked this session yet.</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    const state = {
+      mode: 'personal', tab: 'overview', selectedLoanId: null, wallet: null,
+      linkedAccounts: [
+        { id: 'a1', institutionName: 'BPI Everyday', type: 'bank', mockBalance: 12840 },
+        { id: 'a2', institutionName: 'GCash Wallet', type: 'e-wallet', mockBalance: 1840 },
+        { id: 'a3', institutionName: 'Northstar Brokerage', type: 'brokerage', mockBalance: 22600 }
+      ],
+      investments: [
+        { id: 'i1', name: 'ASEAN Growth ETF', type: 'ETF', value: 14200, changePct: 6.2 },
+        { id: 'i2', name: 'Stellar Infra Basket', type: 'Thematic', value: 5800, changePct: 11.4 },
+        { id: 'i3', name: 'Peso Bond Ladder', type: 'Fixed income', value: 7600, changePct: 1.8 }
+      ],
+      loans: [
+        { id: 'l1', lender: 'DBS Flex Loan', principal: 12000, balance: 6400, interestRate: 6.9, nextPaymentDate: '2026-07-18', nextPaymentAmount: 420, riskScore: 28, dest: 'GBRPYHIL2CI3JTSZQ7V2D4X5M4Y2YQQWJ6KABZ3KQ45M7G6WJQYJ5R7T' },
+        { id: 'l2', lender: 'Maya Credit Line', principal: 4000, balance: 1920, interestRate: 14.2, nextPaymentDate: '2026-07-22', nextPaymentAmount: 210, riskScore: 62, dest: 'GCTESTR6YJ5X6SPSP4KZPTW6IQLZJQY5A7L2U5Q4QUP6S6AXU4U5P2YB' }
+      ],
+      institutions: [
+        { id: 'n1', name: 'BPI Family Savings', type: 'bank', amount: 5200 },
+        { id: 'n2', name: 'DBS Everyday', type: 'bank', amount: 8600 },
+        { id: 'n3', name: 'GCash+', type: 'e-wallet', amount: 980 },
+        { id: 'n4', name: 'Harborview Brokerage', type: 'brokerage', amount: 11400 }
+      ],
+      bizTx: [
+        { name: 'Loan settlement batch A', amount: '$18,200', flag: 'Cleared', level: 'ok' },
+        { name: 'Merchant payout 0x-17', amount: '$9,880', flag: 'Velocity spike', level: 'warn' },
+        { name: 'Institutional repayment', amount: '$26,410', flag: 'Manual review', level: 'bad' }
+      ]
+    };
+
+    const $ = id => document.getElementById(id);
+    const nav = document.querySelectorAll('#nav span');
+    let portfolioChart, bizChart;
+    const money = n => new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n);
+    const short = a => `${a.slice(0,8)}…${a.slice(-6)}`;
+
+    const netWorth = () =>
+      state.linkedAccounts.reduce((s,a)=>s+a.mockBalance,0) +
+      state.investments.reduce((s,i)=>s+i.value,0) -
+      state.loans.reduce((s,l)=>s+l.balance,0);
+
+    const insights = () => {
+      const big = [...state.investments].sort((a,b)=>b.value-a.value)[0];
+      const risky = state.loans.find(l=>l.riskScore>55);
+      return [
+        `Your largest position is ${big.name}. Fine for a demo, but I'd rebalance before calling it disciplined.`,
+        risky ? `${risky.lender} is the one to watch: higher rate, higher risk score, cleanest proactive-repayment story.` : 'Loan risk looks tame. Keep it that way.',
+        'Liquid cash covers the next payment without touching investments. Clean narrative for judges.'
+      ];
+    };
+
+    const riskLabel = s => s < 35 ? { t:'Low', c:'ok' } : s < 60 ? { t:'Moderate', c:'warn' } : { t:'High', c:'bad' };
+
+    function renderOverview() {
+      $('netWorth').textContent = money(netWorth());
+      $('accounts').innerHTML = state.linkedAccounts.map(a=>`
+        <div class="row"><div><div class="k">${a.institutionName}</div><div class="s">${a.type}</div></div><div class="v num">${money(a.mockBalance)}</div></div>`).join('');
+      const next = [...state.loans].sort((a,b)=>new Date(a.nextPaymentDate)-new Date(b.nextPaymentDate))[0];
+      $('upcoming').innerHTML = `
+        <div class="k">${next.lender}</div><div class="s">Due ${next.nextPaymentDate}</div>
+        <div class="midnum num" style="margin:14px 0 18px;">${money(next.nextPaymentAmount)}</div>
+        <button class="btn btn-primary" style="width:100%;" onclick="window.pay('${next.id}')">Pay via Stellar</button>`;
+      $('investRows').innerHTML = state.investments.map(i=>`
+        <div class="row"><div><div class="k">${i.name}</div><div class="s">${i.type}</div></div>
+        <div class="v"><div class="num">${money(i.value)}</div><div class="s num" style="color:${i.changePct>=0?'var(--ok)':'var(--bad)'};">${i.changePct>=0?'+':''}${i.changePct}%</div></div></div>`).join('');
+      $('insights').innerHTML = insights().map((t,idx)=>`<div class="insight"><span class="idx">0${idx+1}</span><span>${t}</span></div>`).join('');
+    }
+
+    function renderLoans() {
+      $('loanCards').innerHTML = state.loans.map(l=>{
+        const r = riskLabel(l.riskScore);
+        return `<button class="loan ${state.selectedLoanId===l.id?'sel':''}" onclick="window.selectLoan('${l.id}')">
+          <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
+            <div><div class="k">${l.lender}</div><div class="s">Principal ${money(l.principal)}</div></div>
+            <span class="tag ${r.c}">${r.t} risk</span></div>
+          <div><div class="s">Remaining</div><div class="midnum num">${money(l.balance)}</div></div>
+          <div><div class="s" style="display:flex;justify-content:space-between;"><span>Risk score</span><span class="num">${l.riskScore}/100</span></div>
+          <div class="meter" style="margin-top:6px;"><i style="width:${l.riskScore}%"></i></div></div>
+        </button>`;
+      }).join('');
+      if (!state.selectedLoanId) return;
+      const l = state.loans.find(x=>x.id===state.selectedLoanId);
+      const r = riskLabel(l.riskScore);
+      $('loanTitle').textContent = l.lender;
+      $('loanRisk').textContent = `${r.t} risk`;
+      $('loanRisk').className = `tag ${r.c}`;
+      $('loanDetail').innerHTML = `
+        <div class="quiet">Interest ${l.interestRate}% · Balance ${money(l.balance)}<br>Destination <span class="mono">${short(l.dest)}</span></div>
+        <div class="inline" style="margin-top:16px;">
+          <button class="btn btn-outline" id="connectWalletBtn">Connect wallet</button>
+          <button class="btn btn-primary" id="payBtn">Pay ${money(l.nextPaymentAmount)} via Stellar</button></div>
+        <div class="quiet" id="walletStatus" style="margin-top:14px;">No wallet connected.</div>
+        <div class="quiet" id="payStatus" style="margin-top:12px;">No payment sent.</div>`;
+      $('connectWalletBtn').onclick = connectWallet;
+      $('payBtn').onclick = () => payLoan(l);
+      updateWalletStatus();
+    }
+
+    function renderInvestments() {
+      $('investInsights').innerHTML = insights().map((t,idx)=>`<div class="insight"><span class="idx">0${idx+1}</span><span>${t}</span></div>`).join('');
+      if (portfolioChart) portfolioChart.destroy();
+      portfolioChart = new Chart($('portfolioChart'), {
+        type:'doughnut',
+        data:{ labels: state.investments.map(i=>i.name),
+          datasets:[{ data: state.investments.map(i=>i.value),
+            backgroundColor:['oklch(50% 0.13 42)','oklch(62% 0.1 30)','oklch(74% 0.06 60)'], borderWidth:0 }] },
+        options:{ cutout:'70%', plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, boxWidth:8, padding:16, font:{ family:'Inter Tight' } } } } }
+      });
+    }
+
+    function renderSettings() {
+      $('profile').innerHTML = `<div class="cell-head"><h3>Profile</h3><span class="lbl">Mock session</span></div>
+        <div class="stack"><div><div class="k serif" style="font-size:1.3rem;">John Paolo Cabaluna</div><div class="s">johnpaolo.cabaluna@dbtc-cebu.edu.ph</div></div>
+        <div class="quiet">Personal mode is consumer-facing. Business mode reframes the same rail for institutions and ops.</div></div>`;
+      $('linkedSummary').innerHTML = `<div class="cell-head"><h3>Linked accounts</h3><span class="lbl">${state.linkedAccounts.length} connected</span></div>
+        <div class="rows">${state.linkedAccounts.map(a=>`<div class="row"><div><div class="k">${a.institutionName}</div><div class="s">${a.type}</div></div><div class="v num">${money(a.mockBalance)}</div></div>`).join('')}</div>`;
+    }
+
+    function renderBusiness() {
+      $('flagged').innerHTML = state.bizTx.map(t=>`
+        <div class="row"><div><div class="k">${t.name}</div><div class="s num">${t.amount}</div></div><span class="tag ${t.level}">${t.flag}</span></div>`).join('');
+      if (bizChart) bizChart.destroy();
+      bizChart = new Chart($('bizChart'), {
+        type:'line',
+        data:{ labels:['09','11','13','15','17','19'],
+          datasets:[{ data:[18,26,21,39,34,44], borderColor:'oklch(45% 0.1 195)', backgroundColor:'rgba(40,120,140,0.08)', fill:true, tension:0.35, pointRadius:0 }] },
+        options:{ plugins:{ legend:{ display:false } }, scales:{ y:{ grid:{ color:'rgba(190,180,165,0.4)' } }, x:{ grid:{ display:false } } } }
+      });
+    }
+
+    function syncTabs() {
+      document.body.classList.toggle('business-mode', state.mode==='business');
+      $('modeChip').textContent = state.mode==='business' ? 'Business' : 'Personal';
+      $('modeToggleBtn').textContent = state.mode==='business' ? 'Personal' : 'Business';
+      nav.forEach(s => s.classList.toggle('on', s.dataset.tab===state.tab && state.mode!=='business'));
+      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+      const active = state.mode==='business' ? 'business' : state.tab;
+      const el = document.querySelector(`[data-view="${active}"]`);
+      if (el) { el.classList.remove('hidden'); el.style.animation='none'; void el.offsetWidth; el.style.animation=''; }
+    }
+
+    function render() {
+      renderOverview(); renderLoans(); renderInvestments(); renderSettings(); renderBusiness(); syncTabs();
+    }
+
+    // wallet + stellar
+    async function connectWallet() {
+      const ws = $('walletStatus'); ws.textContent = 'Checking for Freighter…';
+      try {
+        let address = null;
+        if (window.freighterApi) {
+          const c = await window.freighterApi.isConnected();
+          if (c.isConnected) { await window.freighterApi.setAllowed(); address = (await window.freighterApi.getAddress()).address; }
+        }
+        if (!address) {
+          ws.textContent = 'No Freighter found. Generating a testnet wallet…';
+          const kp = fallbackKeypair(); state.wallet = { ...kp, address: kp.publicKey, mode:'fallback' };
+          await friendbot(kp.publicKey); updateWalletStatus(); return;
+        }
+        state.wallet = { address, mode:'freighter' }; updateWalletStatus();
+      } catch(e){ ws.textContent = `Wallet hiccup: ${e.message}`; }
+    }
+    function updateWalletStatus() {
+      const ws = $('walletStatus'); if (!ws) return;
+      if (!state.wallet) { ws.textContent = 'No wallet connected.'; return; }
+      ws.innerHTML = state.wallet.secret
+        ? `Fallback wallet <span class="mono">${short(state.wallet.address)}</span>, funded via Friendbot.`
+        : `Freighter connected <span class="mono">${short(state.wallet.address)}</span>.`;
+    }
+    function fallbackKeypair() {
+      const ab='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      const r=n=>Array.from({length:n},()=>ab[Math.floor(Math.random()*ab.length)]).join('');
+      return { publicKey:`G${r(55)}`, secret:`S${r(55)}` };
+    }
+    async function friendbot(addr){ const res=await fetch(`https://friendbot.stellar.org?addr=${encodeURIComponent(addr)}`); if(!res.ok) throw new Error('Friendbot failed'); return res.json(); }
+    async function payLoan(l) {
+      const ps=$('payStatus'); if(!state.wallet){ ps.textContent='Connect a wallet first.'; return; }
+      ps.textContent='Submitting testnet payment…';
+      try {
+        const sdk = window.stellarSdk || window.StellarSdk; let hash;
+        if (sdk && state.wallet.secret) {
+          const { Horizon, Keypair, Networks, TransactionBuilder, Operation, Asset } = sdk;
+          const server = new Horizon.Server('https://horizon-testnet.stellar.org');
+          const src = Keypair.fromSecret(state.wallet.secret);
+          const acct = await server.loadAccount(src.publicKey());
+          const fee = await server.fetchBaseFee();
+          const tx = new TransactionBuilder(acct,{ fee, networkPassphrase: Networks.TESTNET })
+            .addOperation(Operation.payment({ destination:l.dest, asset:Asset.native(), amount:String(Math.max(1, Math.round(l.nextPaymentAmount/100))) }))
+            .setTimeout(30).build();
+          tx.sign(src); hash = (await server.submitTransaction(tx)).hash;
+        } else { hash = `demo_${Math.random().toString(36).slice(2,14)}`; }
+        ps.innerHTML = `Submitted. <span class="mono">${hash}</span><br><a style="color:var(--brand);font-weight:600;" href="https://stellar.expert/explorer/testnet/tx/${hash}" target="_blank" rel="noopener">View on stellar.expert →</a>`;
+      } catch(e){ ps.textContent = `Payment failed: ${e.message}`; }
+    }
+    async function runCheck() {
+      const addr=$('addr').value.trim(), st=$('scamStatus'), box=$('scamResult');
+      if(!addr){ st.textContent='Paste an address first.'; return; }
+      st.textContent='Checking Horizon…'; box.classList.remove('show');
+      try {
+        const [ar, tr] = await Promise.all([
+          fetch(`https://horizon-testnet.stellar.org/accounts/${addr}`),
+          fetch(`https://horizon-testnet.stellar.org/accounts/${addr}/transactions?limit=1&order=asc`)
+        ]);
+        if(!ar.ok) throw new Error('Account not found on testnet');
+        const acct=await ar.json(), txs=await tr.json();
+        const txCount = Number(acct.subentry_count||0) + (txs._embedded?.records?.length||0);
+        const created = txs._embedded?.records?.[0]?.created_at || 'Unknown';
+        const isNew = txCount<=1;
+        st.textContent='Check complete.';
+        box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
+          <div class="k mono" style="font-size:0.9rem;">${short(addr)}</div><span class="tag ${isNew?'warn':'ok'}">${isNew?'new':'established'}</span></div>
+          <div class="s">First activity signal · ${created}</div>
+          <div class="s">Observed signal count · ${txCount}</div>
+          <div class="quiet">${isNew?'Brand-new account, little to no history. Be cautious.':'Established account, still review context.'}</div>`;
+        box.classList.add('show');
+      } catch(e){ st.textContent=`Could not verify: ${e.message}`; }
+    }
+
+    window.selectLoan = id => { state.selectedLoanId=id; state.tab='loans'; state.mode='personal'; render(); };
+    window.pay = id => window.selectLoan(id);
+
+    nav.forEach(s => s.addEventListener('click', ()=>{ state.mode='personal'; state.tab=s.dataset.tab; render(); }));
+    $('loginBtn').onclick = ()=>{ $('landing').classList.add('hidden'); $('app').classList.remove('hidden'); $('scrim').classList.add('open'); render(); };
+    const logout = ()=>{ Object.assign(state,{ mode:'personal', tab:'overview', selectedLoanId:null, wallet:null }); $('email').value=''; $('password').value=''; $('app').classList.add('hidden'); $('landing').classList.remove('hidden'); $('scrim').classList.remove('open'); };
+    $('logoutBtn').onclick = logout; $('settingsLogout').onclick = logout;
+    $('connectAccountBtn').onclick = ()=>$('scrim').classList.add('open');
+    $('closeScrim').onclick = ()=>$('scrim').classList.remove('open');
+    $('modeToggleBtn').onclick = ()=>{ state.mode = state.mode==='business'?'personal':'business'; state.tab = state.mode==='business'?'business':'overview'; render(); };
+    $('orderBtn').onclick = ()=>{ $('orderStatus').textContent = `Confirmed: ${money(Number($('amount').value||0))} via ${$('channel').value}. As fake as intended, and that's the point.`; };
+
+    $('instGrid').innerHTML = state.institutions.map(i=>`<button class="inst" data-id="${i.id}"><b>${i.name}</b><div class="s">${i.type}</div><div class="amt num">${money(i.amount)}</div></button>`).join('');
+    $('instGrid').onclick = e => {
+      const b = e.target.closest('[data-id]'); if(!b) return;
+      const inst = state.institutions.find(x=>x.id===b.dataset.id);
+      $('linkStatus').textContent = `Linking ${inst.name}…`;
+      setTimeout(()=>{ state.linkedAccounts.push({ id:`ln-${Date.now()}`, institutionName:inst.name, type:inst.type, mockBalance:inst.amount }); $('linkStatus').textContent = `${inst.name} linked. Added ${money(inst.amount)}.`; render(); }, 1100);
+    };
+
+    render();
+  </script>
+</body>
+</html>

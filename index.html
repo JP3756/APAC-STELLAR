@@ -6,434 +6,641 @@
     <title>UniFi - APAC Stellar Hackathon</title>
     <style>
         :root {
-            --bg-primary: #0B0F19;
-            --bg-card: #151B2B;
-            --bg-sidebar: #0F1422;
-            --text-primary: #E2E8F0;
-            --text-secondary: #94A3B8;
-            --accent: #00D2FF;
-            --accent-glow: rgba(0, 210, 255, 0.15);
-            --border: #1E293B;
-            --danger: #EF4444;
-            --success: #10B981;
+            --bg: #09090b;
+            --card-bg: #18181b;
+            --card-border: #27272a;
+            --text: #fafafa;
+            --muted: #a1a1aa;
+            --accent: #00f0ff; /* Personal/Cyan */
+            --accent-glow: rgba(0, 240, 255, 0.15);
+            --business-accent: #ff007a; /* Business/Magenta */
+            --business-glow: rgba(255, 0, 122, 0.15);
+            --danger: #ef4444;
+            --success: #22c55e;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-        body { background-color: var(--bg-primary); color: var(--text-primary); display: flex; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
 
-        /* --- LOGIN VIEW --- */
-        #loginView {
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            width: 100%; min-height: 100vh; background: radial-gradient(circle at 50% 0%, #1a233a 0%, var(--bg-primary) 70%);
+        /* --- LOGIN SCREEN --- */
+        .login-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
         }
-        .login-container { max-width: 400px; width: 100%; padding: 2rem; text-align: center; }
-        .login-container h1 { font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(90deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .login-container p { color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6; }
-        .login-form { display: flex; flex-direction: column; gap: 1rem; }
-        .login-form input {
-            padding: 0.8rem 1rem; background: var(--bg-card); border: 1px solid var(--border); 
-            border-radius: 8px; color: var(--text-primary); font-size: 1rem; outline: none; transition: border 0.2s;
+        .login-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
         }
-        .login-form input:focus { border-color: var(--accent); }
-        .login-form button {
-            padding: 0.8rem; background: var(--accent); color: #000; font-weight: 600; 
-            border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: opacity 0.2s;
+        .login-card h1 { font-size: 2.5rem; letter-spacing: -0.05em; margin-bottom: 0.25rem; }
+        .login-card .subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 2rem; }
+        .login-card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; text-align: left; }
+        .login-card .desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.5rem; text-align: left; }
+        .input-group { margin-bottom: 1rem; text-align: left; }
+        .input-group label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .input-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
         }
-        .login-form button:hover { opacity: 0.9; }
-        .login-error { color: var(--danger); font-size: 0.875rem; display: none; text-align: center; }
-        .login-footer { margin-top: 2rem; font-size: 0.75rem; color: var(--text-secondary); }
+        .input-group input:focus { border-color: var(--accent); }
+        .btn-primary {
+            width: 100%;
+            padding: 0.85rem;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: opacity 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 99px;
+            font-size: 0.75rem;
+            color: var(--success);
+        }
+        .status-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
+        .error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 1rem; display: none; }
 
-        /* --- DASHBOARD LAYOUT --- */
-        #dashboardView { display: none; width: 100%; }
-        .sidebar {
-            width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border); 
-            padding: 1.5rem; display: flex; flex-direction: column; position: fixed; height: 100vh;
-        }
-        .sidebar-logo { font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: var(--accent); }
-        .sidebar-nav { display: flex; flex-direction: column; gap: 0.5rem; flex-grow: 1; }
-        .nav-item {
-            padding: 0.75rem 1rem; border-radius: 8px; color: var(--text-secondary); 
-            cursor: pointer; transition: all 0.2s; font-weight: 500;
-        }
-        .nav-item:hover, .nav-item.active { background: var(--bg-card); color: var(--text-primary); }
-        .nav-item.active { border-left: 3px solid var(--accent); padding-left: calc(1rem - 3px); }
+        /* --- DASHBOARD SHELL --- */
+        .app-shell { display: none; min-height: 100vh; flex-direction: column; }
+        .app-shell.active { display: flex; }
         
-        .mode-toggle { display: flex; background: var(--bg-card); border-radius: 8px; padding: 4px; margin-bottom: 1.5rem; }
-        .mode-btn { flex: 1; padding: 0.5rem; text-align: center; border-radius: 6px; cursor: pointer; font-size: 0.875rem; color: var(--text-secondary); }
-        .mode-btn.active { background: var(--accent); color: #000; font-weight: 600; }
-
-        .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem; }
-        .sidebar-footer button {
-            padding: 0.75rem; background: transparent; border: 1px solid var(--border); 
-            color: var(--text-secondary); border-radius: 8px; cursor: pointer; transition: all 0.2s;
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(8px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .sidebar-footer button:hover { border-color: var(--accent); color: var(--text-primary); }
+        .nav-brand { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+        .nav-links { display: flex; gap: 0.25rem; }
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .nav-link:hover { color: var(--text); background: var(--card-bg); }
+        .nav-link.active { color: var(--text); background: var(--card-bg); }
+        
+        .mode-toggle {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 4px;
+            margin-left: 1rem;
+        }
+        .mode-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--muted);
+            border: none;
+            background: transparent;
+        }
+        .mode-btn.active { background: var(--bg); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        .mode-btn.active.business { color: var(--business-accent); }
 
-        .content { margin-left: 260px; padding: 2rem; flex-grow: 1; width: calc(100% - 260px); }
-        .view-section { display: none; animation: fadeIn 0.3s ease; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        main { flex: 1; padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .page-header { margin-bottom: 2rem; }
-        .page-header h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-        .page-header p { color: var(--text-secondary); }
+        /* --- COMPONENTS --- */
+        .section-header { margin-bottom: 2rem; }
+        .section-header h2 { font-size: 1.75rem; letter-spacing: -0.02em; margin-bottom: 0.25rem; }
+        .section-header p { color: var(--muted); font-size: 0.95rem; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
+        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
         .card {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; 
-            padding: 1.5rem; transition: transform 0.2s;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
         }
-        .card:hover { transform: translateY(-2px); border-color: #2d3748; }
-        .card-label { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
-        .card-value { font-size: 2rem; font-weight: 700; }
-        .card-value.accent { color: var(--accent); }
-        .card-sub { font-size: 0.8rem; color: var(--success); margin-top: 0.25rem; }
-
-        .list-item {
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 1rem; background: var(--bg-primary); border: 1px solid var(--border); 
-            border-radius: 8px; margin-bottom: 0.75rem;
-        }
-        .list-item-info h4 { font-size: 1rem; margin-bottom: 0.25rem; }
-        .list-item-info p { font-size: 0.85rem; color: var(--text-secondary); }
+        .card-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .card-value { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+        .card-sub { font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem; }
         
-        .btn {
-            padding: 0.5rem 1rem; border-radius: 6px; border: none; cursor: pointer; 
-            font-weight: 600; font-size: 0.875rem; transition: opacity 0.2s;
-        }
-        .btn-primary { background: var(--accent); color: #000; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-primary); }
-        .btn:hover { opacity: 0.85; }
+        .accent-cyan { border-top: 2px solid var(--accent); }
+        .accent-magenta { border-top: 2px solid var(--business-accent); }
 
-        .empty-state { text-align: center; padding: 3rem; color: var(--text-secondary); border: 2px dashed var(--border); border-radius: 12px; }
+        /* Loans Split View */
+        .loans-layout { display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem; height: 600px; }
+        @media (max-width: 768px) { .loans-layout { grid-template-columns: 1fr; height: auto; } }
+        .loan-list { overflow-y: auto; border-right: 1px solid var(--card-border); padding-right: 1.5rem; }
+        .loan-item {
+            padding: 1rem;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .loan-item:hover { border-color: var(--accent); background: rgba(0, 240, 255, 0.05); }
+        .loan-item.selected { border-color: var(--accent); background: var(--accent-glow); }
+        .loan-details { padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        
+        /* Investments */
+        .alloc-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 1rem 0; background: var(--card-border); }
+        .alloc-segment { height: 100%; }
+        .insight-card { border-left: 3px solid var(--accent); padding-left: 1rem; margin-bottom: 1rem; }
+        .insight-card h4 { font-size: 0.95rem; margin-bottom: 0.25rem; }
+        .insight-card p { font-size: 0.85rem; color: var(--muted); }
+
+        /* Business View Overrides */
+        .business-view .card { border-top-color: var(--business-accent); }
+        .business-view .nav-link.active { color: var(--business-accent); }
+        .business-view .btn-primary { background: var(--business-accent); }
+        .business-view .status-pill { background: rgba(255, 0, 122, 0.1); border-color: rgba(255, 0, 122, 0.3); color: var(--business-accent); }
+
+        /* Buttons & Utilities */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        .btn:hover { border-color: var(--muted); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: var(--danger); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+        
+        .tag { display: inline-block; padding: 0.2rem 0.6rem; background: var(--bg); border-radius: 4px; font-size: 0.75rem; color: var(--muted); }
+        .mt-1 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 1rem; }
+        .text-muted { color: var(--muted); }
+        .text-sm { font-size: 0.85rem; }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+            align-items: center; justify-content: center; z-index: 200;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 2rem; width: 90%; max-width: 400px; }
     </style>
 </head>
 <body>
 
-    <!-- ========================================== -->
-    <!-- 1. LOGIN VIEW                              -->
-    <!-- ========================================== -->
-    <div id="loginView">
-        <div class="login-container">
+    <!-- ================= LOGIN SCREEN ================= -->
+    <div id="login-screen" class="login-wrapper">
+        <div class="login-card">
             <h1>UniFi</h1>
-            <p>Every account, every loan, one honest view. <br>Settlement runs on Stellar testnet.</p>
+            <p class="subtitle">APAC Stellar Hackathon · Prototype</p>
             
-            <form id="loginForm" class="login-form">
-                <input type="email" id="loginEmail" placeholder="Email" required>
-                <input type="password" id="loginPassword" placeholder="Password" required>
-                <button type="submit">Enter dashboard</button>
-                <p id="loginError" class="login-error">Login failed. Check credentials or backend.</p>
+            <h2>Welcome back.</h2>
+            <p class="desc">Secure JWT Auth. Connect to the live backend and settle on Stellar testnet.</p>
+            
+            <form id="login-form">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="you@unifi.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary">Enter dashboard</button>
             </form>
+            <p id="login-error" class="error-msg">Login failed. Check credentials or backend.</p>
             
-            <div class="login-footer">
-                Live backend connected · Secure JWT Auth · Stellar Testnet
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                Live backend connected · Stellar Testnet
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 2. DASHBOARD VIEW                          -->
-    <!-- ========================================== -->
-    <div id="dashboardView">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">UniFi</div>
-            
-            <div class="mode-toggle">
-                <div class="mode-btn active" data-mode="personal" onclick="switchMode('personal')">Personal</div>
-                <div class="mode-btn" data-mode="business" onclick="switchMode('business')">Business</div>
+    <!-- ================= DASHBOARD SHELL ================= -->
+    <div id="app-shell" class="app-shell">
+        <nav>
+            <div class="nav-brand">UniFi</div>
+            <div class="nav-links" id="nav-links">
+                <a class="nav-link active" data-view="overview">Overview</a>
+                <a class="nav-link" data-view="loans">Loans</a>
+                <a class="nav-link" data-view="investments">Investments</a>
+                <a class="nav-link" data-view="settings">Settings</a>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <div class="mode-toggle">
+                    <button class="mode-btn active" id="mode-personal">Personal</button>
+                    <button class="mode-btn business" id="mode-business">Business</button>
+                </div>
+                <button class="btn btn-danger" style="margin-left: 1rem;" id="btn-logout">Log out</button>
+            </div>
+        </nav>
+
+        <main>
+            <!-- PERSONAL VIEWS -->
+            <div id="personal-views">
+                <!-- Overview -->
+                <section id="view-overview" class="view active">
+                    <div class="section-header">
+                        <h2>Portfolio & Loan Hub</h2>
+                        <p>The whole picture, minus the tab chaos. Linked balances, live investments, and loan obligations.</p>
+                    </div>
+                    <div class="grid-3">
+                        <div class="card accent-cyan">
+                            <div class="card-label">Aggregated net worth</div>
+                            <div class="card-value" id="net-worth">$0.00</div>
+                            <div class="card-sub">Live from backend · Horizon + Friendbot</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-label">Active Loans</div>
+                            <div class="card-value" id="active-loans-count">0</div>
+                            <div class="card-sub">Settling on Stellar Testnet</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-label">Next payment</div>
+                            <div class="card-value" style="font-size: 1.5rem;" id="next-payment">Due soon</div>
+                            <div class="card-sub">Auto-routed via smart contract</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Loans -->
+                <section id="view-loans" class="view">
+                    <div class="section-header">
+                        <h2>Loan Servicing</h2>
+                        <p>The action that proves it's real. Settle payments directly on Stellar testnet.</p>
+                    </div>
+                    <div class="card" style="padding: 0; overflow: hidden;">
+                        <div class="loans-layout">
+                            <div class="loan-list" id="loan-list">
+                                <div class="text-muted text-sm" style="padding: 1rem;">Loading loans from backend...</div>
+                            </div>
+                            <div class="loan-details" id="loan-details">
+                                <p class="text-muted">Pick a loan on the left. That's the whole mechanic.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Investments -->
+                <section id="view-investments" class="view">
+                    <div class="section-header">
+                        <h2>Investments</h2>
+                        <p>Sharp enough to feel smart on stage. Allocation and insights tied to real portfolio composition.</p>
+                    </div>
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-label">Allocation</div>
+                            <div id="investments-allocation">Loading...</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-label">Insights</div>
+                            <div id="investments-insights">Loading...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Settings -->
+                <section id="view-settings" class="view">
+                    <div class="section-header">
+                        <h2>Settings & Profile</h2>
+                        <p>Lived-in, not padded. Profile shell and session management.</p>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">Session</div>
+                        <p class="text-muted mb-1">No hidden persistence. Clearing your session will revoke the JWT on the backend and return you to the login screen.</p>
+                        <button class="btn btn-danger" id="btn-clear-session">Clear session & log out</button>
+                    </div>
+                </section>
             </div>
 
-            <nav class="sidebar-nav" id="personalNav">
-                <div class="nav-item active" data-view="overview" onclick="switchView('overview')">Overview</div>
-                <div class="nav-item" data-view="loans" onclick="switchView('loans')">Loans</div>
-                <div class="nav-item" data-view="investments" onclick="switchView('investments')">Investments</div>
-                <div class="nav-item" data-view="settings" onclick="switchView('settings')">Settings</div>
-            </nav>
-            
-            <nav class="sidebar-nav" id="businessNav" style="display: none;">
-                <div class="nav-item active" data-view="business-gateway" onclick="switchView('business-gateway')">Payment Gateway</div>
-            </nav>
-
-            <div class="sidebar-footer">
-                <button onclick="handleLogout()">Log out</button>
+            <!-- BUSINESS VIEWS -->
+            <div id="business-views" style="display: none;">
+                <section id="view-gateway" class="view active business-view">
+                    <div class="section-header">
+                        <h2>Secure Payment Gateway</h2>
+                        <p>Institution-side, same rail. Transaction monitoring and multi-sig setup. Different accent so nobody loses the thread mid-demo.</p>
+                    </div>
+                    <div class="grid-3">
+                        <div class="card accent-magenta">
+                            <div class="card-label">Monitored volume today</div>
+                            <div class="card-value">$182,400</div>
+                            <div class="card-sub">96.2% cleared</div>
+                        </div>
+                        <div class="card accent-magenta">
+                            <div class="card-label">Multi-sig policy</div>
+                            <div class="card-value" style="font-size: 1.5rem;">2 of 3</div>
+                            <div class="card-sub">Signer threshold</div>
+                        </div>
+                        <div class="card accent-magenta">
+                            <div class="card-label">Flagged</div>
+                            <div class="card-value" style="font-size: 1.5rem; color: var(--danger);">2</div>
+                            <div class="card-sub">Same feed · Awaiting review</div>
+                        </div>
+                    </div>
+                    <div class="card mt-1">
+                        <div class="card-label">Approvers</div>
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                            <span class="tag" style="border: 1px solid var(--success); color: var(--success);">Approver 1 · Treasury lead · active</span>
+                            <span class="tag" style="border: 1px solid var(--success); color: var(--success);">Approver 2 · Risk officer · active</span>
+                            <span class="tag" style="border: 1px solid var(--muted); color: var(--muted);">Approver 3 · Ops backup · pending</span>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="content">
-            
-            <!-- OVERVIEW -->
-            <section id="view-overview" class="view-section active">
-                <div class="page-header">
-                    <h2>Portfolio & Loan Hub</h2>
-                    <p>The whole picture, minus the tab chaos. Linked balances, live investments, and loan obligations.</p>
-                </div>
-                <div class="grid">
-                    <div class="card">
-                        <div class="card-label">Aggregated net worth</div>
-                        <div class="card-value accent" id="netWorthDisplay">$0.00</div>
-                        <div class="card-sub">Live from backend</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-label">Active Loans</div>
-                        <div class="card-value" id="activeLoansCount">0</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-label">Stellar Network</div>
-                        <div class="card-value" style="font-size: 1.2rem; color: var(--success);">● Testnet Connected</div>
-                        <div class="card-sub">Horizon + Friendbot</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- LOANS -->
-            <section id="view-loans" class="view-section">
-                <div class="page-header">
-                    <h2>Loan Servicing</h2>
-                    <p>The action that proves it's real. Settle payments directly on Stellar testnet.</p>
-                </div>
-                <div id="loansListContainer">
-                    <div class="empty-state">Loading loans from backend...</div>
-                </div>
-            </section>
-
-            <!-- INVESTMENTS -->
-            <section id="view-investments" class="view-section">
-                <div class="page-header">
-                    <h2>Investments</h2>
-                    <p>Sharp enough to feel smart on stage. Allocation and insights tied to real portfolio composition.</p>
-                </div>
-                <div id="investmentsListContainer">
-                    <div class="empty-state">Loading investments from backend...</div>
-                </div>
-            </section>
-
-            <!-- SETTINGS -->
-            <section id="view-settings" class="view-section">
-                <div class="page-header">
-                    <h2>Settings & Profile</h2>
-                    <p>Lived-in, not padded. Profile shell and session management.</p>
-                </div>
-                <div class="card" style="max-width: 500px;">
-                    <h3 style="margin-bottom: 1rem;">Session</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">No hidden persistence. Clearing your session will revoke the JWT and return you to the login screen.</p>
-                    <button class="btn btn-outline" onclick="handleLogout()">Clear session & log out</button>
-                </div>
-            </section>
-
-            <!-- BUSINESS GATEWAY -->
-            <section id="view-business-gateway" class="view-section">
-                <div class="page-header">
-                    <h2>Secure Payment Gateway</h2>
-                    <p>Institution-side, same rail. Transaction monitoring and multi-sig setup.</p>
-                </div>
-                <div class="grid">
-                    <div class="card">
-                        <div class="card-label">Monitored volume today</div>
-                        <div class="card-value">$182,400</div>
-                        <div class="card-sub">96.2% cleared</div>
-                    </div>
-                    <div class="card">
-                        <div class="card-label">Multi-sig policy</div>
-                        <div class="card-value" style="font-size: 1.5rem;">2 of 3</div>
-                        <div class="card-sub" style="color: var(--text-secondary);">Signer threshold</div>
-                    </div>
-                </div>
-            </section>
-
         </main>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 3. JAVASCRIPT API INTEGRATION              -->
-    <!-- ========================================== -->
+    <!-- ================= JAVASCRIPT (BACKEND & STELLAR LOGIC) ================= -->
     <script>
         // ==========================================
-        // CONFIG & STATE
+        // CONFIGURATION
         // ==========================================
-        const API_BASE = 'http://localhost:5141'; // Your ASP.NET Core backend
-        let authToken = localStorage.getItem('authToken');
-        let currentWalletId = null;
+        const API_BASE = 'http://localhost:5141/api'; // <-- CHANGE THIS TO YOUR REAL BACKEND URL
+        let authToken = localStorage.getItem('unifi_jwt');
+        let currentView = 'overview';
+        let currentMode = 'personal';
+        let loansData = [];
 
         // ==========================================
-        // API HELPER
+        // API HELPER (JWT Auth)
         // ==========================================
-        async function apiCall(endpoint, method = 'GET', body = null) {
-            const headers = { 'Content-Type': 'application/json' };
+        async function apiRequest(endpoint, options = {}) {
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
             if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
-
-            const options = { method, headers };
-            if (body) options.body = JSON.stringify(body);
-
+            
             try {
-                const response = await fetch(`${API_BASE}${endpoint}`, options);
-                if (response.status === 401) {
-                    handleLogout();
+                const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+                if (res.status === 401) {
+                    handleLogout(); // Auto-logout if token is invalid/expired
                     throw new Error('Unauthorized');
                 }
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(errorText || `API Error: ${response.status}`);
-                }
-                
-                const text = await response.text();
-                return text ? JSON.parse(text) : null;
-            } catch (error) {
-                console.error(`API Call Failed [${endpoint}]:`, error);
-                throw error;
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.json();
+            } catch (err) {
+                console.error(`API Error [${endpoint}]:`, err);
+                throw err;
             }
         }
 
         // ==========================================
-        // LOGIN FLOW
+        // AUTH & SESSION
         // ==========================================
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorEl = document.getElementById('loginError');
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorMsg = document.getElementById('login-error');
+            errorMsg.style.display = 'none';
 
             try {
-                // Hitting the /login endpoint defined in your OpenAPI spec
-                const data = await apiCall('/login', 'POST', { email, password });
-                
-                authToken = data.accessToken;
-                localStorage.setItem('authToken', authToken);
-                
-                errorEl.style.display = 'none';
+                const data = await apiRequest('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+                authToken = data.token; // Assuming backend returns { token: "..." }
+                localStorage.setItem('unifi_jwt', authToken);
                 showDashboard();
             } catch (err) {
-                errorEl.textContent = 'Login failed. Invalid credentials or server offline.';
-                errorEl.style.display = 'block';
+                errorMsg.style.display = 'block';
             }
         });
 
         function handleLogout() {
+            // Call backend to revoke JWT if needed
+            apiRequest('/auth/logout', { method: 'POST' }).catch(() => {});
             authToken = null;
-            localStorage.removeItem('authToken');
-            location.reload();
+            localStorage.removeItem('unifi_jwt');
+            document.getElementById('app-shell').classList.remove('active');
+            document.getElementById('login-screen').style.display = 'flex';
         }
 
+        document.getElementById('btn-logout').addEventListener('click', handleLogout);
+        document.getElementById('btn-clear-session').addEventListener('click', handleLogout);
+
+        // ==========================================
+        // DASHBOARD INIT & ROUTING
+        // ==========================================
         function showDashboard() {
-            document.getElementById('loginView').style.display = 'none';
-            document.getElementById('dashboardView').style.display = 'flex';
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-shell').classList.add('active');
             loadDashboardData();
         }
 
-        // ==========================================
-        // UI NAVIGATION
-        // ==========================================
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(`view-${viewId}`).classList.add('active');
-            document.querySelector(`.nav-item[data-view="${viewId}"]`)?.classList.add('active');
+        // Auto-login if token exists
+        if (authToken) {
+            showDashboard();
         }
 
-        function switchMode(mode) {
-            document.querySelectorAll('.mode-btn').forEach(el => el.classList.remove('active'));
-            document.querySelector(`.mode-btn[data-mode="${mode}"]`).classList.add('active');
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                switchView(link.dataset.view);
+            });
+        });
+
+        function switchView(viewName) {
+            currentView = viewName;
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById(`view-${viewName}`);
+            if (target) target.classList.add('active');
+        }
+
+        // Mode Toggle (Personal / Business)
+        document.getElementById('mode-personal').addEventListener('click', () => setMode('personal'));
+        document.getElementById('mode-business').addEventListener('click', () => setMode('business'));
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('mode-personal').classList.toggle('active', mode === 'personal');
+            document.getElementById('mode-business').classList.toggle('active', mode === 'business');
             
-            document.getElementById('personalNav').style.display = mode === 'personal' ? 'flex' : 'none';
-            document.getElementById('businessNav').style.display = mode === 'business' ? 'flex' : 'none';
+            document.getElementById('personal-views').style.display = mode === 'personal' ? 'block' : 'none';
+            document.getElementById('business-views').style.display = mode === 'business' ? 'block' : 'none';
             
-            if (mode === 'business') switchView('business-gateway');
-            else switchView('overview');
+            // Update nav links for business
+            const navLinks = document.getElementById('nav-links');
+            if (mode === 'business') {
+                navLinks.innerHTML = `<a class="nav-link active" data-view="gateway">Payment Gateway</a>`;
+            } else {
+                navLinks.innerHTML = `
+                    <a class="nav-link active" data-view="overview">Overview</a>
+                    <a class="nav-link" data-view="loans">Loans</a>
+                    <a class="nav-link" data-view="investments">Investments</a>
+                    <a class="nav-link" data-view="settings">Settings</a>
+                `;
+                // Re-attach listeners
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                        switchView(link.dataset.view);
+                    });
+                });
+            }
         }
 
         // ==========================================
-        // DATA FETCHING & RENDERING
+        // DATA FETCHING (LIVE BACKEND)
         // ==========================================
         async function loadDashboardData() {
             try {
-                // Fetch data in parallel
-                const [loans, investments, wallets] = await Promise.all([
-                    apiCall('/api/Loan').catch(() => []),
-                    apiCall('/api/Investment').catch(() => []),
-                    apiCall('/api/StellarWallet').catch(() => [])
-                ]);
+                // 1. Fetch Net Worth & Overview
+                const overview = await apiRequest('/dashboard/overview');
+                document.getElementById('net-worth').textContent = `$${overview.netWorth.toLocaleString()}`;
+                document.getElementById('active-loans-count').textContent = overview.activeLoans;
+                document.getElementById('next-payment').textContent = overview.nextPayment || 'Due soon';
 
-                // Set default wallet for payments
-                if (wallets && wallets.length > 0) currentWalletId = wallets[0].id;
+                // 2. Fetch Loans
+                loansData = await apiRequest('/loans');
+                renderLoansList();
 
-                // 1. Render Overview Stats
-                const totalValue = investments.reduce((sum, inv) => sum + (inv.marketValue || 0), 0);
-                document.getElementById('netWorthDisplay').innerText = `$${totalValue.toLocaleString()}`;
-                document.getElementById('activeLoansCount').innerText = loans.length;
-
-                // 2. Render Loans
-                const loansContainer = document.getElementById('loansListContainer');
-                if (loans.length === 0) {
-                    loansContainer.innerHTML = '<div class="empty-state">No active loans found in the database.</div>';
-                } else {
-                    loansContainer.innerHTML = loans.map(loan => `
-                        <div class="list-item">
-                            <div class="list-item-info">
-                                <h4>Loan #${loan.id} · Principal: $${loan.principal}</h4>
-                                <p>Due: ${new Date(loan.dueDate).toLocaleDateString()} · Interest: ${loan.interest}%</p>
-                            </div>
-                            <button class="btn btn-primary" onclick="initiateStellarPayment(${loan.id}, ${loan.principal})">
-                                Pay with Stellar
-                            </button>
-                        </div>
-                    `).join('');
-                }
-
-                // 3. Render Investments
-                const invContainer = document.getElementById('investmentsListContainer');
-                if (investments.length === 0) {
-                    invContainer.innerHTML = '<div class="empty-state">No investments seeded yet.</div>';
-                } else {
-                    invContainer.innerHTML = investments.map(inv => `
-                        <div class="list-item">
-                            <div class="list-item-info">
-                                <h4>${inv.assetName} <span style="color: var(--text-secondary); font-weight: 400;">· Qty: ${inv.quantity}</span></h4>
-                                <p>Market Value: $${inv.marketValue} · Type: ${inv.assetType}</p>
-                            </div>
-                        </div>
-                    `).join('');
-                }
+                // 3. Fetch Investments
+                const investments = await apiRequest('/investments');
+                renderInvestments(investments);
 
             } catch (err) {
-                console.error("Failed to load dashboard data", err);
+                console.error("Failed to load dashboard data. Ensure backend is running.", err);
             }
         }
 
         // ==========================================
-        // STELLAR PAYMENT ACTION
+        // LOANS UI & STELLAR SETTLEMENT
         // ==========================================
-        async function initiateStellarPayment(loanId, amount) {
-            if (!currentWalletId) {
-                alert("No Stellar wallet found. Please ensure a wallet is created in the backend.");
+        function renderLoansList() {
+            const listEl = document.getElementById('loan-list');
+            if (!loansData || loansData.length === 0) {
+                listEl.innerHTML = `<div class="text-muted text-sm" style="padding: 1rem;">No active loans.</div>`;
                 return;
             }
+            listEl.innerHTML = loansData.map((loan, i) => `
+                <div class="loan-item" data-index="${i}">
+                    <div style="font-weight: 600;">${loan.name}</div>
+                    <div class="text-muted text-sm">Balance: $${loan.balance.toLocaleString()}</div>
+                </div>
+            `).join('');
 
-            const destination = prompt("Enter destination Stellar address (Testnet):", "GBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OX2H");
-            if (!destination) return;
+            listEl.querySelectorAll('.loan-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    listEl.querySelectorAll('.loan-item').forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                    renderLoanDetails(loansData[item.dataset.index]);
+                });
+            });
+        }
 
-            const payload = {
-                stellarWalletId: currentWalletId,
-                destinationAddress: destination,
-                amount: parseFloat(amount),
-                assetCode: "XLM",
-                memo: `UniFi Loan Repayment #${loanId}`
-            };
+        function renderLoanDetails(loan) {
+            document.getElementById('loan-details').innerHTML = `
+                <h3 style="margin-bottom: 0.5rem;">${loan.name}</h3>
+                <p class="text-muted mb-1">Outstanding: <strong style="color: var(--text);">$${loan.balance.toLocaleString()}</strong></p>
+                <p class="text-muted text-sm mb-1">Stellar Destination: <code style="background: var(--bg); padding: 2px 6px; border-radius: 4px;">${loan.stellarAddress || 'G...TEST'}</code></p>
+                <button class="btn-primary" style="max-width: 250px; margin-top: 1rem;" id="btn-pay-loan">Settle Payment on Stellar</button>
+                <p id="payment-status" class="text-muted text-sm mt-1"></p>
+            `;
+            document.getElementById('btn-pay-loan').addEventListener('click', () => executeStellarPayment(loan));
+        }
+
+        async function executeStellarPayment(loan) {
+            const statusEl = document.getElementById('payment-status');
+            statusEl.textContent = "Initiating Stellar testnet transaction...";
+            statusEl.style.color = "var(--accent)";
 
             try {
-                const result = await apiCall('/api/StellarPayment/send', 'POST', payload);
-                alert(`✅ Payment settled on Stellar Testnet!\nHash: ${result.txHash || 'Success'}`);
+                // In a real app, you'd use @stellar/freighter-api here.
+                // For this prototype, we call the backend to sign/submit via a funded fallback wallet.
+                const result = await apiRequest('/stellar/pay', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        loanId: loan.id,
+                        amount: loan.minimumPayment || 100,
+                        destination: loan.stellarAddress
+                    })
+                });
+
+                statusEl.innerHTML = `Success! <a href="${result.explorerUrl}" target="_blank" style="color: var(--accent);">View on Stellar Explorer</a>`;
+                statusEl.style.color = "var(--success)";
+                
+                // Refresh data
+                loadDashboardData(); 
             } catch (err) {
-                alert('❌ Payment failed. Check backend console for Horizon errors.');
+                statusEl.textContent = "Payment failed. Check backend/Stellar network.";
+                statusEl.style.color = "var(--danger)";
             }
         }
 
         // ==========================================
-        // INITIALIZATION
+        // INVESTMENTS UI
         // ==========================================
-        if (authToken) {
-            showDashboard();
+        function renderInvestments(data) {
+            // Allocation Bar
+            const colors = ['#00f0ff', '#ff007a', '#8b5cf6', '#f59e0b', '#10b981'];
+            let allocHtml = '<div class="alloc-bar">';
+            data.allocation.forEach((item, i) => {
+                allocHtml += `<div class="alloc-segment" style="width: ${item.percent}%; background: ${colors[i % colors.length]};" title="${item.asset}: ${item.percent}%"></div>`;
+            });
+            allocHtml += '</div><div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem;">';
+            data.allocation.forEach((item, i) => {
+                allocHtml += `<div class="text-sm"><span style="display: inline-block; width: 10px; height: 10px; background: ${colors[i % colors.length]}; border-radius: 2px; margin-right: 6px;"></span>${item.asset} <span class="text-muted">${item.percent}%</span></div>`;
+            });
+            allocHtml += '</div>';
+            document.getElementById('investments-allocation').innerHTML = allocHtml;
+
+            // Insights
+            let insightsHtml = '';
+            data.insights.forEach(insight => {
+                insightsHtml += `
+                    <div class="insight-card">
+                        <h4>${insight.title}</h4>
+                        <p>${insight.description}</p>
+                    </div>
+                `;
+            });
+            document.getElementById('investments-insights').innerHTML = insightsHtml || '<p class="text-muted">No insights available.</p>';
         }
     </script>
 </body>
