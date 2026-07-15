@@ -82,6 +82,7 @@ builder.Services.AddAutoMapper(cfg =>
 });
 
 builder.Services.AddScoped<ILoanService, LoanService>();
+builder.Services.AddScoped<IConnectedAccService, ConnectedAccService>();
 builder.Services.AddScoped<IdentitySeederService>();
 
 var app = builder.Build();
