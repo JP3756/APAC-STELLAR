@@ -4,11 +4,11 @@ using System.ComponentModel.DataAnnotations;
 namespace ApacStellar2026.Models;
 
 public class ConnectedAccount
-{ 
+{
     [Key]
     public int AccountId { get; set; }
 
-    public ApplicationUser User { get; set; }
+    public ApplicationUser? User { get; set; }
 
     public int InstitutionId { get; set; }
 

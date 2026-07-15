@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations;
 namespace ApacStellar2026.Models;
 
 public class FinancialInstitution
-{ 
+{
     [Key]
     public int FinancialInstitutionId { get; set; }
 
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     public int InstitutionType { get; set; }
 

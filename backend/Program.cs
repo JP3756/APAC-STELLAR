@@ -9,6 +9,7 @@ using System.Security.Claims;
 using ApacStellar2026.DatabaseCtx;
 using ApacStellar2026.Models;
 using ApacStellar2026.Settings;
+using ApacStellar2026.Interface;
 using ApacStellar2026.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,6 +74,14 @@ builder.Services.AddRateLimiter(options =>
         await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", cancellationToken);
     };
 });
+
+//AutoMapper Config bitch
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(Program).Assembly);
+});
+
+builder.Services.AddScoped<ILoanService, LoanService>();
 builder.Services.AddScoped<IdentitySeederService>();
 
 var app = builder.Build();

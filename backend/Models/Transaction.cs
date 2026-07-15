@@ -3,17 +3,17 @@ using System.ComponentModel.DataAnnotations;
 namespace ApacStellar2026.Models;
 
 public class Transaction
-{ 
+{
     [Key]
     public int TransactionId { get; set; }
 
     public int LoanId { get; set; }
 
-    public Loan Loan { get; set; }
+    public Loan? Loan { get; set; }
 
     public int InvestmentId { get; set; }
 
-    public Investment Investment { get; set; }
+    public Investment? Investment { get; set; }
 
     public int Principal { get; set; }
 
