@@ -3,13 +3,13 @@ using System.ComponentModel.DataAnnotations;
 namespace ApacStellar2026.Models;
 
 public class Loan
-{ 
+{
     [Key]
     public int LoanId { get; set; }
 
     public int AccountId { get; set; }
 
-    public ConnectedAccount Account { get; set; }
+    public required ConnectedAccount Account { get; set; }
 
     public int LoanNumber { get; set; }
 

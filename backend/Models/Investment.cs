@@ -1,19 +1,20 @@
+using ApacStellar2026.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace ApacStellar2026.Models;
 
 public class Investment
-{ 
+{
     [Key]
     public int InvestmentId { get; set; }
 
     public int AccountId { get; set; }
 
-    public ConnectedAccount Account { get; set; }
+    public ConnectedAccount? Account { get; set; }
 
-    public string AssetName { get; set; }
+    public required string AssetName { get; set; }
 
-    public int AssetType { get; set; }
+    public AssetType AssetType { get; set; }
 
     public int Quantity { get; set; }
 
