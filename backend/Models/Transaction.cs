@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using ApacStellar2026.Models.Enums;
 
 namespace ApacStellar2026.Models;
 
@@ -23,7 +24,7 @@ public class Transaction
 
     public DateTime Date { get; set; }
 
-    public bool Status { get; set; }
+    public TransactionType TransactionType { get; set; }
 
     public bool StellarTxHash { get; set; }
 

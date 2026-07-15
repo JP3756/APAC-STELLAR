@@ -181,8 +181,8 @@ namespace ApacStellar2026.Migrations
                     b.Property<int>("Principal")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("boolean");
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("StellarTxHash")
                         .HasColumnType("boolean");

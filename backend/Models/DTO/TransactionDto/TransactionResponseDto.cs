@@ -1,5 +1,7 @@
 namespace ApacStellar2026.Dto.TransactionDto;
 
+using ApacStellar2026.Models.Enums;
+
 public class TransactionResponseDto
 {
     public int TransactionId { get; set; }
@@ -9,7 +11,7 @@ public class TransactionResponseDto
     public int Amount { get; set; }
     public int Currency { get; set; }
     public DateTime Date { get; set; }
-    public bool Status { get; set; }
+    public TransactionType TransactionType { get; set; }
     public bool StellarTxHash { get; set; }
     public bool Description { get; set; }
 }
