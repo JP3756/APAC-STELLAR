@@ -1,5 +1,6 @@
 using ApacStellar2026.Models.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApacStellar2026.Models;
 
@@ -8,6 +9,10 @@ public class ConnectedAccount
     [Key]
     public int AccountId { get; set; }
 
+    [Required]
+    public string ApplicationUserId { get; set; } = string.Empty;
+
+    [ForeignKey(nameof(ApplicationUserId))]
     public ApplicationUser? User { get; set; }
 
     public int InstitutionId { get; set; }

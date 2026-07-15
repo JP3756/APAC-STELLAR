@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ApacStellar2026.Dto.FinancialInstitutionDto;
 using ApacStellar2026.Interface;
 
@@ -16,6 +17,7 @@ public class FinancialInstitutionController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetFinancialInstitutions()
     {
         var result = await _financialInstitutionService.GetAllAsync();
@@ -23,6 +25,7 @@ public class FinancialInstitutionController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetFinancialInstitutionById(int id)
     {
         var result = await _financialInstitutionService.GetByIdAsync(id);
@@ -35,6 +38,7 @@ public class FinancialInstitutionController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Business")]
     public async Task<IActionResult> CreateFinancialInstitution([FromBody] FinancialInstitutionCreateDto request)
     {
         if (request == null)
@@ -47,6 +51,7 @@ public class FinancialInstitutionController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = "Admin,Business")]
     public async Task<IActionResult> UpdateFinancialInstitution(int id, [FromBody] UpdateFinancialInstitutionDto request)
     {
         if (request == null)
@@ -64,6 +69,7 @@ public class FinancialInstitutionController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin,Business")]
     public async Task<IActionResult> DeleteFinancialInstitution(int id)
     {
         var deleted = await _financialInstitutionService.DeleteAsync(id);

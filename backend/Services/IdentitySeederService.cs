@@ -15,7 +15,7 @@ public class IdentitySeederService {
 
     public async Task SeedRolesAsync()
     {
-        string[] roles = ["User"];
+        string[] roles = ["User", "Admin", "Business"];
 
         foreach (var role in roles)
         {

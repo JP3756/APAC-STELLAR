@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using ApacStellar2026.Dto.ConnectedAccDto;
 using ApacStellar2026.Interface;
 
@@ -6,6 +8,7 @@ namespace ApacStellar2026.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class ConnectedAccController : ControllerBase
 {
     private readonly IConnectedAccService _connectedAccService;
@@ -15,17 +18,21 @@ public class ConnectedAccController : ControllerBase
         _connectedAccService = connectedAccService;
     }
 
+    private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
     [HttpGet]
     public async Task<IActionResult> GetConnectedAccounts()
     {
-        var result = await _connectedAccService.GetAllAsync();
+        var userId = GetCurrentUserId();
+        var result = await _connectedAccService.GetAllByUserIdAsync(userId);
         return Ok(result);
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetConnectedAccountById(int id)
     {
-        var result = await _connectedAccService.GetByIdAsync(id);
+        var userId = GetCurrentUserId();
+        var result = await _connectedAccService.GetByIdAndUserIdAsync(id, userId);
         if (result == null)
         {
             return NotFound(new { message = $"Connected account with ID {id} not found." });
@@ -42,7 +49,8 @@ public class ConnectedAccController : ControllerBase
             return BadRequest(new { message = "Connected account data is null." });
         }
 
-        var result = await _connectedAccService.CreateAsync(request);
+        var userId = GetCurrentUserId();
+        var result = await _connectedAccService.CreateAsync(request, userId);
         return CreatedAtAction(nameof(GetConnectedAccountById), new { id = result.AccountId }, result);
     }
 
@@ -54,7 +62,8 @@ public class ConnectedAccController : ControllerBase
             return BadRequest(new { message = "Connected account data is null." });
         }
 
-        var result = await _connectedAccService.UpdateAsync(id, request);
+        var userId = GetCurrentUserId();
+        var result = await _connectedAccService.UpdateAsync(id, request, userId);
         if (result == null)
         {
             return NotFound(new { message = $"Connected account with ID {id} not found." });
@@ -66,7 +75,8 @@ public class ConnectedAccController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteConnectedAccount(int id)
     {
-        var deleted = await _connectedAccService.DeleteAsync(id);
+        var userId = GetCurrentUserId();
+        var deleted = await _connectedAccService.DeleteAsync(id, userId);
         if (!deleted)
         {
             return NotFound(new { message = $"Connected account with ID {id} not found." });

@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# App settings with secrets -- NEVER commit development config
+**/appsettings.Development.json
+
 # User-specific files
 *.rsuser
 *.suo

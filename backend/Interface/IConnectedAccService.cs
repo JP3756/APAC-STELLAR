@@ -4,9 +4,9 @@ namespace ApacStellar2026.Interface;
 
 public interface IConnectedAccService
 {
-    Task<List<ConnectedAccResponseDto>> GetAllAsync();
-    Task<ConnectedAccResponseDto?> GetByIdAsync(int id);
-    Task<ConnectedAccResponseDto> CreateAsync(ConnectedAccCreateDto dto);
-    Task<ConnectedAccResponseDto?> UpdateAsync(int id, UpdateConnectedAccDto dto);
-    Task<bool> DeleteAsync(int id);
+    Task<List<ConnectedAccResponseDto>> GetAllByUserIdAsync(string userId);
+    Task<ConnectedAccResponseDto?> GetByIdAndUserIdAsync(int id, string userId);
+    Task<ConnectedAccResponseDto> CreateAsync(ConnectedAccCreateDto dto, string userId);
+    Task<ConnectedAccResponseDto?> UpdateAsync(int id, UpdateConnectedAccDto dto, string userId);
+    Task<bool> DeleteAsync(int id, string userId);
 }

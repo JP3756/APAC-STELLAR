@@ -18,29 +18,43 @@ public class LoanService : ILoanService
         _mapper = mapper;
     }
 
-    public async Task<List<LoanResponseDto>> GetAllLoansAsync()
+    public async Task<List<LoanResponseDto>> GetLoansByUserIdAsync(string userId)
     {
-        var loans = await _dbCtx.Loan.ToListAsync();
+        var loans = await _dbCtx.Loan
+            .Include(l => l.Account)
+            .Where(l => l.Account.ApplicationUserId == userId)
+            .ToListAsync();
         return _mapper.Map<List<LoanResponseDto>>(loans);
     }
 
-    public async Task<LoanResponseDto?> GetLoanByIdAsync(int id)
+    public async Task<LoanResponseDto?> GetLoanByIdAndUserIdAsync(int id, string userId)
     {
-        var loan = await _dbCtx.Loan.FindAsync(id);
+        var loan = await _dbCtx.Loan
+            .Include(l => l.Account)
+            .FirstOrDefaultAsync(l => l.LoanId == id && l.Account.ApplicationUserId == userId);
         return loan == null ? null : _mapper.Map<LoanResponseDto>(loan);
     }
 
-    public async Task<LoanResponseDto> CreateLoanAsync(LoanCreateDto dto)
+    public async Task<LoanResponseDto?> CreateLoanAsync(LoanCreateDto dto, string userId)
     {
+        var account = await _dbCtx.ConnectedAccount
+            .FirstOrDefaultAsync(ca => ca.AccountId == dto.AccountId && ca.ApplicationUserId == userId);
+        if (account == null)
+        {
+            return null;
+        }
+
         var entity = _mapper.Map<Loan>(dto);
         await _dbCtx.Loan.AddAsync(entity);
         await _dbCtx.SaveChangesAsync();
         return _mapper.Map<LoanResponseDto>(entity);
     }
 
-    public async Task<LoanResponseDto?> UpdateLoanAsync(int id, UpdateLoanDto dto)
+    public async Task<LoanResponseDto?> UpdateLoanAsync(int id, UpdateLoanDto dto, string userId)
     {
-        var existing = await _dbCtx.Loan.FindAsync(id);
+        var existing = await _dbCtx.Loan
+            .Include(l => l.Account)
+            .FirstOrDefaultAsync(l => l.LoanId == id && l.Account.ApplicationUserId == userId);
         if (existing == null)
         {
             return null;
@@ -51,9 +65,11 @@ public class LoanService : ILoanService
         return _mapper.Map<LoanResponseDto>(existing);
     }
 
-    public async Task<bool> DeleteLoanAsync(int id)
+    public async Task<bool> DeleteLoanAsync(int id, string userId)
     {
-        var loan = await _dbCtx.Loan.FindAsync(id);
+        var loan = await _dbCtx.Loan
+            .Include(l => l.Account)
+            .FirstOrDefaultAsync(l => l.LoanId == id && l.Account.ApplicationUserId == userId);
         if (loan == null)
         {
             return false;

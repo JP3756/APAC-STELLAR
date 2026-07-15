@@ -18,38 +18,39 @@ public class ConnectedAccService : IConnectedAccService
         _mapper = mapper;
     }
 
-    public async Task<List<ConnectedAccResponseDto>> GetAllAsync()
+    public async Task<List<ConnectedAccResponseDto>> GetAllByUserIdAsync(string userId)
     {
         var connectedAccounts = await _dbCtx.ConnectedAccount
             .Include(ca => ca.FinancialInstitution)
+            .Where(ca => ca.ApplicationUserId == userId)
             .ToListAsync();
         return _mapper.Map<List<ConnectedAccResponseDto>>(connectedAccounts);
     }
 
-    public async Task<ConnectedAccResponseDto?> GetByIdAsync(int id)
+    public async Task<ConnectedAccResponseDto?> GetByIdAndUserIdAsync(int id, string userId)
     {
         var connectedAccount = await _dbCtx.ConnectedAccount
             .Include(ca => ca.FinancialInstitution)
-            .FirstOrDefaultAsync(ca => ca.AccountId == id);
+            .FirstOrDefaultAsync(ca => ca.AccountId == id && ca.ApplicationUserId == userId);
         return connectedAccount == null ? null : _mapper.Map<ConnectedAccResponseDto>(connectedAccount);
     }
 
-    public async Task<ConnectedAccResponseDto> CreateAsync(ConnectedAccCreateDto dto)
+    public async Task<ConnectedAccResponseDto> CreateAsync(ConnectedAccCreateDto dto, string userId)
     {
         var entity = _mapper.Map<ConnectedAccount>(dto);
+        entity.ApplicationUserId = userId;
         await _dbCtx.ConnectedAccount.AddAsync(entity);
         await _dbCtx.SaveChangesAsync();
 
-        // Reload with navigation property for the response
         await _dbCtx.Entry(entity).Reference(ca => ca.FinancialInstitution).LoadAsync();
         return _mapper.Map<ConnectedAccResponseDto>(entity);
     }
 
-    public async Task<ConnectedAccResponseDto?> UpdateAsync(int id, UpdateConnectedAccDto dto)
+    public async Task<ConnectedAccResponseDto?> UpdateAsync(int id, UpdateConnectedAccDto dto, string userId)
     {
         var existing = await _dbCtx.ConnectedAccount
             .Include(ca => ca.FinancialInstitution)
-            .FirstOrDefaultAsync(ca => ca.AccountId == id);
+            .FirstOrDefaultAsync(ca => ca.AccountId == id && ca.ApplicationUserId == userId);
         if (existing == null)
         {
             return null;
@@ -60,9 +61,10 @@ public class ConnectedAccService : IConnectedAccService
         return _mapper.Map<ConnectedAccResponseDto>(existing);
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task<bool> DeleteAsync(int id, string userId)
     {
-        var connectedAccount = await _dbCtx.ConnectedAccount.FindAsync(id);
+        var connectedAccount = await _dbCtx.ConnectedAccount
+            .FirstOrDefaultAsync(ca => ca.AccountId == id && ca.ApplicationUserId == userId);
         if (connectedAccount == null)
         {
             return false;

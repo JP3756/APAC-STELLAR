@@ -47,7 +47,20 @@ builder.Services.AddAuthentication(options =>
         RoleClaimType = ClaimTypes.Role
     };
 });
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireUserRole", policy => policy.RequireRole("User", "Admin", "Business"));
+    options.AddPolicy("RequireAdminOrBusinessRole", policy => policy.RequireRole("Admin", "Business"));
+});
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(builder.Configuration["Jwt:Audience"] ?? "http://127.0.0.1:5500")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi(options =>
@@ -81,12 +94,24 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddMaps(typeof(Program).Assembly);
 });
 
+// Bind StellarSettings
+builder.Services.Configure<StellarSettings>(builder.Configuration.GetSection("StellarSettings"));
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
+
+// Register existing services
 builder.Services.AddScoped<ILoanService, LoanService>();
 builder.Services.AddScoped<IConnectedAccService, ConnectedAccService>();
 builder.Services.AddScoped<IFinancialInstitutionService, FinancialInstitutionService>();
 builder.Services.AddScoped<IInvestmentService, InvestmentService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<IdentitySeederService>();
+builder.Services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
+
+// Register Stellar services
+builder.Services.AddScoped<StellarService>();
+builder.Services.AddScoped<IStellarWalletService, StellarWalletService>();
+builder.Services.AddScoped<IStellarPaymentService, StellarPaymentService>();
+builder.Services.AddScoped<IStellarAssetService, StellarAssetService>();
 
 var app = builder.Build();
 
@@ -98,9 +123,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
+app.MapIdentityApi<ApplicationUser>();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }))
    .AllowAnonymous();
 app.MapControllers();

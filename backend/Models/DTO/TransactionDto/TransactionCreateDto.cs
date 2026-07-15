@@ -11,6 +11,6 @@ public class TransactionCreateDto
     public int Currency { get; set; }
     public DateTime Date { get; set; }
     public TransactionType TransactionType { get; set; }
-    public bool StellarTxHash { get; set; }
+    public string? StellarTxHash { get; set; }
     public bool Description { get; set; }
 }

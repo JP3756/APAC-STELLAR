@@ -13,6 +13,7 @@ public class ConnectedAccProfile : Profile
 
         CreateMap<ConnectedAccCreateDto, ConnectedAccount>()
             .ForMember(dest => dest.AccountId, opt => opt.Ignore())
+            .ForMember(dest => dest.ApplicationUserId, opt => opt.Ignore())
             .ForMember(dest => dest.User, opt => opt.Ignore())
             .ForMember(dest => dest.FinancialInstitution, opt => opt.Ignore())
             .ForMember(dest => dest.Loans, opt => opt.Ignore())
@@ -21,6 +22,7 @@ public class ConnectedAccProfile : Profile
         CreateMap<UpdateConnectedAccDto, ConnectedAccount>()
             .ForMember(dest => dest.AccountId, opt => opt.Ignore())
             .ForMember(dest => dest.InstitutionId, opt => opt.Ignore())
+            .ForMember(dest => dest.ApplicationUserId, opt => opt.Ignore())
             .ForMember(dest => dest.User, opt => opt.Ignore())
             .ForMember(dest => dest.FinancialInstitution, opt => opt.Ignore())
             .ForMember(dest => dest.Loans, opt => opt.Ignore())

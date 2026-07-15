@@ -4,9 +4,9 @@ namespace ApacStellar2026.Interface;
 
 public interface ITransactionService
 {
-    Task<List<TransactionResponseDto>> GetAllAsync();
-    Task<TransactionResponseDto?> GetByIdAsync(int id);
-    Task<TransactionResponseDto> CreateAsync(TransactionCreateDto dto);
-    Task<TransactionResponseDto?> UpdateAsync(int id, UpdateTransactionDto dto);
-    Task<bool> DeleteAsync(int id);
+    Task<List<TransactionResponseDto>> GetTransactionsByUserIdAsync(string userId);
+    Task<TransactionResponseDto?> GetByIdAndUserIdAsync(int id, string userId);
+    Task<TransactionResponseDto?> CreateAsync(TransactionCreateDto dto, string userId);
+    Task<TransactionResponseDto?> UpdateAsync(int id, UpdateTransactionDto dto, string userId);
+    Task<bool> DeleteAsync(int id, string userId);
 }

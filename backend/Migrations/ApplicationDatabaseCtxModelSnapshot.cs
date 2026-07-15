@@ -22,6 +22,84 @@ namespace ApacStellar2026.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ApacStellar2026.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MiddleName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Suffix")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
             modelBuilder.Entity("ApacStellar2026.Models.ConnectedAccount", b =>
                 {
                     b.Property<int>("AccountId")
@@ -33,7 +111,11 @@ namespace ApacStellar2026.Migrations
                     b.Property<int>("AccountType")
                         .HasColumnType("integer");
 
-                    b.Property<int>("FinancialInstitutionId")
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("FinancialInstitutionId")
                         .HasColumnType("integer");
 
                     b.Property<int>("InstitutionId")
@@ -42,15 +124,11 @@ namespace ApacStellar2026.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("AccountId");
 
-                    b.HasIndex("FinancialInstitutionId");
+                    b.HasIndex("ApplicationUserId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("FinancialInstitutionId");
 
                     b.ToTable("ConnectedAccount");
                 });
@@ -64,7 +142,6 @@ namespace ApacStellar2026.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FinancialInstitutionId"));
 
                     b.Property<string>("ApiEndpoint")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("InstitutionType")
@@ -149,6 +226,123 @@ namespace ApacStellar2026.Migrations
                     b.ToTable("Loan");
                 });
 
+            modelBuilder.Entity("ApacStellar2026.Models.StellarAsset", b =>
+                {
+                    b.Property<int>("StellarAssetId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StellarAssetId"));
+
+                    b.Property<string>("AssetCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AssetIssuer")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,7)");
+
+                    b.Property<bool>("IsIssuer")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("StellarWalletId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("StellarAssetId");
+
+                    b.HasIndex("StellarWalletId");
+
+                    b.ToTable("StellarAsset");
+                });
+
+            modelBuilder.Entity("ApacStellar2026.Models.StellarPayment", b =>
+                {
+                    b.Property<int>("StellarPaymentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StellarPaymentId"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,7)");
+
+                    b.Property<string>("AssetCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DestinationAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Memo")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StellarWalletId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TransactionHash")
+                        .HasColumnType("text");
+
+                    b.HasKey("StellarPaymentId");
+
+                    b.HasIndex("StellarWalletId");
+
+                    b.ToTable("StellarPayment");
+                });
+
+            modelBuilder.Entity("ApacStellar2026.Models.StellarWallet", b =>
+                {
+                    b.Property<int>("StellarWalletId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("StellarWalletId"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Network")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PublicKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SecretKeyEncrypted")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("StellarWalletId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("StellarWallet");
+                });
+
             modelBuilder.Entity("ApacStellar2026.Models.Transaction", b =>
                 {
                     b.Property<int>("TransactionId")
@@ -178,11 +372,11 @@ namespace ApacStellar2026.Migrations
                     b.Property<int>("Principal")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("Status")
-                        .HasColumnType("boolean");
+                    b.Property<string>("StellarTxHash")
+                        .HasColumnType("text");
 
-                    b.Property<bool>("StellarTxHash")
-                        .HasColumnType("boolean");
+                    b.Property<int>("TransactionType")
+                        .HasColumnType("integer");
 
                     b.HasKey("TransactionId");
 
@@ -242,79 +436,6 @@ namespace ApacStellar2026.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("character varying(21)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator().HasValue("IdentityUser");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -398,40 +519,17 @@ namespace ApacStellar2026.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ApacStellar2026.Models.ApplicationUser", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("MiddleName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Suffix")
-                        .HasColumnType("text");
-
-                    b.HasDiscriminator().HasValue("ApplicationUser");
-                });
-
             modelBuilder.Entity("ApacStellar2026.Models.ConnectedAccount", b =>
                 {
-                    b.HasOne("ApacStellar2026.Models.FinancialInstitution", "FinancialInstitution")
+                    b.HasOne("ApacStellar2026.Models.ApplicationUser", "User")
                         .WithMany("ConnectedAccounts")
-                        .HasForeignKey("FinancialInstitutionId")
+                        .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ApacStellar2026.Models.ApplicationUser", "User")
+                    b.HasOne("ApacStellar2026.Models.FinancialInstitution", "FinancialInstitution")
                         .WithMany("ConnectedAccounts")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FinancialInstitutionId");
 
                     b.Navigation("FinancialInstitution");
 
@@ -458,6 +556,39 @@ namespace ApacStellar2026.Migrations
                         .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("ApacStellar2026.Models.StellarAsset", b =>
+                {
+                    b.HasOne("ApacStellar2026.Models.StellarWallet", "StellarWallet")
+                        .WithMany("Assets")
+                        .HasForeignKey("StellarWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StellarWallet");
+                });
+
+            modelBuilder.Entity("ApacStellar2026.Models.StellarPayment", b =>
+                {
+                    b.HasOne("ApacStellar2026.Models.StellarWallet", "StellarWallet")
+                        .WithMany("Payments")
+                        .HasForeignKey("StellarWalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StellarWallet");
+                });
+
+            modelBuilder.Entity("ApacStellar2026.Models.StellarWallet", b =>
+                {
+                    b.HasOne("ApacStellar2026.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ApacStellar2026.Models.Transaction", b =>
@@ -490,7 +621,7 @@ namespace ApacStellar2026.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ApacStellar2026.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -499,7 +630,7 @@ namespace ApacStellar2026.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ApacStellar2026.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -514,7 +645,7 @@ namespace ApacStellar2026.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ApacStellar2026.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -523,11 +654,16 @@ namespace ApacStellar2026.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ApacStellar2026.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ApacStellar2026.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("ConnectedAccounts");
                 });
 
             modelBuilder.Entity("ApacStellar2026.Models.ConnectedAccount", b =>
@@ -552,9 +688,11 @@ namespace ApacStellar2026.Migrations
                     b.Navigation("Transactions");
                 });
 
-            modelBuilder.Entity("ApacStellar2026.Models.ApplicationUser", b =>
+            modelBuilder.Entity("ApacStellar2026.Models.StellarWallet", b =>
                 {
-                    b.Navigation("ConnectedAccounts");
+                    b.Navigation("Assets");
+
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

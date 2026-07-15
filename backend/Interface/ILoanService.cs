@@ -4,9 +4,9 @@ namespace ApacStellar2026.Interface;
 
 public interface ILoanService
 {
-    Task<List<LoanResponseDto>> GetAllLoansAsync();
-    Task<LoanResponseDto?> GetLoanByIdAsync(int id);
-    Task<LoanResponseDto> CreateLoanAsync(LoanCreateDto dto);
-    Task<LoanResponseDto?> UpdateLoanAsync(int id, UpdateLoanDto dto);
-    Task<bool> DeleteLoanAsync(int id);
+    Task<List<LoanResponseDto>> GetLoansByUserIdAsync(string userId);
+    Task<LoanResponseDto?> GetLoanByIdAndUserIdAsync(int id, string userId);
+    Task<LoanResponseDto?> CreateLoanAsync(LoanCreateDto dto, string userId);
+    Task<LoanResponseDto?> UpdateLoanAsync(int id, UpdateLoanDto dto, string userId);
+    Task<bool> DeleteLoanAsync(int id, string userId);
 }

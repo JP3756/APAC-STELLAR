@@ -1,3 +1,5 @@
+using ApacStellar2026.Models.Enums;
+
 namespace ApacStellar2026.Dto.TransactionDto;
 
 public class UpdateTransactionDto
@@ -9,6 +11,6 @@ public class UpdateTransactionDto
     public int Currency { get; set; }
     public DateTime Date { get; set; }
     public TransactionType TransactionType { get; set; }
-    public bool StellarTxHash { get; set; }
+    public string? StellarTxHash { get; set; }
     public bool Description { get; set; }
 }
